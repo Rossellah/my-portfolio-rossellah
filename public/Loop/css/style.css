@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400&display=swap');
+
+body {
+    background: linear-gradient(135deg, #ffbbf1, #d1c6ff);
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    padding: 50px;
+    margin: 0;
+}
+
+/* Container Box */
+.box-container {
+    background-color: rgba(255, 220, 230, 0.459); 
+    padding: 40px;
+    border-radius: 25px;
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.2);
+    display: inline-block;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    margin-top: 70px;
+    box-sizing: border-box;
+}
+
+/* Input Field */
+input {
+    width: 100%;
+    max-width: 350px;
+    padding: 15px;
+    border: 5px solid #f78b9b;
+    border-radius: 20px;
+    outline: none;
+    font-size: 25px;
+    background-color: #fcdeef;
+    color: #e93a5a;
+    display: block;
+    margin: 0 auto 20px;
+    box-sizing: border-box;
+}
+
+/* Button Container - Always 2 Columns */
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Buttons: Default (Desktop and Tablet) */
+button {
+    flex: 1 1 calc(50% - 20px); /* Two buttons per row */
+    min-width: 120px;
+    max-width: 200px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 40px;
+    background: linear-gradient(to right, #d87f82, #e6967e);
+    color: rgb(252, 244, 234);
+    font-size: x-large;
+    font-family: 'Pacifico', cursive;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.5s;
+    box-sizing: border-box;
+}
+
+/* Button Hover Effects */
+button:hover {
+    background: linear-gradient(to right, #ff758c, #ff7eb3);
+    transform: scale(1.1);
+    animation: bounce 0.5s;
+}
+
+/* Display Output */
+#display {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #d6336c; 
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #ffe2eb7e;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+/* 💡 Responsive Fix for Small Devices */
+@media (max-width: 480px) {
+    .box-container {
+        padding: 30px;
+        margin-top: 50px;
+    }
+
+    input {
+        font-size: 18px;
+        padding: 12px;
+    }
+
+    button {
+        flex: 1 1 calc(48% - 10px); /* Shrink buttons for tight fit */
+        font-size: 16px;
+        padding: 8px 12px;
+        min-width: unset;
+    }
+
+    .button-container {
+        gap: 10px;
+    }
+
+    #display {
+        font-size: 20px;
+        padding: 8px;
+    }
+}

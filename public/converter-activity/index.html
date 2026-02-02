@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <script src="./js/converter.js"></script>
+    <link rel="stylesheet" href="./css/style.css"> 
+</head>
+<body>
+    <div class="converter">
+        <h1>Currency Converter</h1>
+        <div class="inputs">
+            <div>PHP<input type="number" id="phpAmount" placeholder="Enter amount in PHP">
+        </div>
+        <div class="outputs">
+            <!-- Change this button to trigger conversion on click -->
+            <button onclick="convertCurrency()">Convert</button>
+            <div>US Dollar (USD): <input type="text" id="US Dollar" disabled>
+            </div>
+            <div>Chinese Yuan (CNY): <input type="text" id="Yuan" disabled>
+            </div>
+            <div>Euro (EUR): <input type="text" id="EUR" disabled>
+            </div>
+            <div>Japanese Yen (JPY): <input type="text" id="Yen" disabled>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
