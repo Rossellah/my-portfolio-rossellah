@@ -29,7 +29,7 @@ function Home() {
       {/* Navigation Bar */}
       <nav className="bg-[#121829]/80 sticky top-0 z-50 backdrop-blur-xl border-b border-[#1e293b]">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between py-5">
-          <h1 className="text-lg sm:text-xl font-semibold text-[#f1f5f9] tracking-tight">Rossellah</h1>
+          <h1 className="text-lg sm:text-xl font-semibold text-[#f1f5f9] tracking-tight">My Portfolio</h1>
           <button
             className="sm:hidden text-[#f1f5f9] text-2xl focus:outline-none"
             onClick={() => setMenuOpen(!menuOpen)}
