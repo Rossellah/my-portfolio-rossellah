@@ -306,11 +306,34 @@ function Home() {
         {/* Webinars Tab */}
         {certTab === "webinars" && (
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <div className="flex flex-col items-center justify-center py-20">
-              <p className="text-2xl sm:text-3xl font-semibold text-[#f1f5f9] mb-4">No Webinars Yet</p>
-              <p className="text-[#cbd5e1] text-center max-w-md">
-                Webinar information will be added soon. Stay tuned!
-              </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  name: "Digital Safety - Cybersecurity & PNPKI",
+                  file: "lheng-digital-safety.jpg",
+                  type: "image"
+                }
+              ].map((cert, index) => (
+                <div
+                  key={index}
+                  className="bg-[#1a1f3a]/50 border border-[#1e293b] rounded-xl overflow-hidden shadow-lg hover:border-[#4f46e5]/50 hover:bg-[#1a1f3a]/80 hover:shadow-xl hover:shadow-[#4f46e5]/10 transition-all duration-300 cursor-pointer group"
+                  onClick={() => {
+                    setSelectedCert(cert.file);
+                    certificateDialog.open();
+                  }}
+                >
+                  {cert.type === "image" && (
+                    <img
+                      src={cert.file}
+                      alt={cert.name}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  )}
+                  <div className="p-4">
+                    <p className="text-sm font-medium text-[#cbd5e1] text-center group-hover:text-[#4f46e5] transition-colors">{cert.name}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
