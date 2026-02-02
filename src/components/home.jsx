@@ -72,7 +72,7 @@ function Home() {
       <section className="text-center pt-28 pb-20 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto">
           <img
-            src="leng.jpg"
+            src="lhengie.jpg"
             className="mx-auto w-32 h-32 sm:w-40 sm:h-40 rounded-full border border-[#1e293b] shadow-2xl shadow-[#4f46e5]/10 mb-10 object-cover cursor-pointer hover:shadow-[#4f46e5]/20 transition-all duration-300"
             alt="Rossellah Marie Bodaño"
             onClick={profileDialog.open}
