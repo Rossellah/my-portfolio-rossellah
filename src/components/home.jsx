@@ -17,11 +17,13 @@ import {
   FaCertificate,
   FaProjectDiagram,
   FaComments,
-  FaSparkles,
   FaPalette,
-  FaLayerGroup,
   FaRocket,
-  FaStar
+  FaStar,
+  FaBolt,
+  FaPaintBrush,
+  FaCogs,
+  FaHeart
 } from "react-icons/fa";
 import { Dialog, useDialog } from "./Dialog";
 
@@ -66,7 +68,7 @@ function Home() {
   }, [menuOpen]);
 
   const navItems = [
-    { label: "Home", section: "home", icon: <FaSparkles /> },
+    { label: "Home", section: "home", icon: <FaStar /> },
     { label: "About", section: "about", icon: <FaUser /> },
     { label: "Skills", section: "skills", icon: <FaCode /> },
     { label: "Projects", section: "projects", icon: <FaProjectDiagram /> },
