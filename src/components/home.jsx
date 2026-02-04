@@ -20,7 +20,8 @@ import {
   FaSparkles,
   FaPalette,
   FaLayerGroup,
-  FaRocket
+  FaRocket,
+  FaStar
 } from "react-icons/fa";
 import { Dialog, useDialog } from "./Dialog";
 
@@ -186,18 +187,20 @@ function Home() {
         }}
       ></div>
 
-      {/* Floating Geometric Shapes */}
+      {/* Floating Stars */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {[...Array(8)].map((_, i) => (
+        {[...Array(15)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-64 h-64 border border-indigo-500/10 rounded-full opacity-10"
+            className="absolute animate-pulse"
             style={{
-              top: `${20 + i * 10}%`,
-              left: `${10 + i * 12}%`,
-              transform: `rotate(${i * 45}deg)`,
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${i * 0.2}s`,
             }}
-          />
+          >
+            <FaStar className={`text-yellow-300/30 ${Math.random() > 0.5 ? 'text-sm' : 'text-xs'}`} />
+          </div>
         ))}
       </div>
 
@@ -212,7 +215,7 @@ function Home() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-xl blur-lg opacity-50 group-hover:opacity-70 transition-opacity duration-300"></div>
                 <div className="relative rounded-xl bg-gray-900/80 p-2.5 border border-purple-500/30 backdrop-blur-sm group-hover:scale-105 transition-transform duration-300">
-                  <FaSparkles className="text-xl text-transparent bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text" />
+                  <FaStar className="text-xl text-transparent bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text" />
                 </div>
               </div>
               <div className="flex flex-col">
@@ -239,6 +242,7 @@ function Home() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm opacity-70">{item.icon}</span>
                     <span className="text-sm">{item.label}</span>
+                    {active === item.section && <FaStar className="text-xs text-yellow-400 ml-1" />}
                   </div>
                   {active === item.section && (
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full"></div>
@@ -284,6 +288,7 @@ function Home() {
                       {item.icon}
                     </span>
                     <span>{item.label}</span>
+                    {active === item.section && <FaStar className="text-xs text-yellow-400 ml-auto" />}
                   </a>
                 ))}
               </div>
@@ -314,14 +319,16 @@ function Home() {
             </div>
             {/* Unique Floating Element */}
             <div className="absolute -bottom-3 -right-3 bg-gradient-to-br from-pink-500 to-purple-600 w-12 h-12 rounded-xl flex items-center justify-center shadow-2xl border-2 border-gray-900 rotate-12 group-hover:rotate-0 transition-transform duration-300">
-              <FaPalette className="text-white" />
+              <FaStar className="text-white" />
             </div>
           </div>
           
           {/* Name with Unique Typography */}
           <div className="mb-6">
             <div className="inline-block px-4 py-2 bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-full border border-pink-500/30 mb-4">
-              <span className="text-sm font-medium text-pink-300">Welcome</span>
+              <span className="text-sm font-medium text-pink-300 flex items-center gap-1">
+                <FaStar className="text-yellow-400" /> Welcome
+              </span>
             </div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-3">
               <span className="block mb-2 text-gray-300">I'm</span>
@@ -333,13 +340,19 @@ function Home() {
           
           {/* Tagline with Unique Style */}
           <div className="relative inline-block mb-8">
-            <p className="text-lg md:text-xl text-gray-300 font-medium px-6 py-3 bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/50 shadow-lg">
+            <p className="text-lg md:text-xl text-gray-300 font-medium px-6 py-3 bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/50 shadow-lg flex items-center gap-2">
+              <FaStar className="text-yellow-400 text-sm" />
               <span className="text-pink-300">Frontend Developer</span>
               <span className="text-gray-400 mx-2">•</span>
               <span className="text-purple-300">UI/UX Specialist</span>
+              <FaStar className="text-yellow-400 text-sm" />
             </p>
-            <div className="absolute -top-2 -left-2 w-4 h-4 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full"></div>
-            <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full"></div>
+            <div className="absolute -top-2 -left-2 w-4 h-4 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full flex items-center justify-center">
+              <FaStar className="text-white text-xs" />
+            </div>
+            <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center">
+              <FaStar className="text-white text-xs" />
+            </div>
           </div>
           
           {/* Tech Stack with Unique Layout */}
@@ -347,8 +360,9 @@ function Home() {
             {["React Ecosystem", "Modern JavaScript", "Responsive Design", "UI/UX Principles", "Web Performance", "Creative Coding"].map((tech, idx) => (
               <span
                 key={idx}
-                className="px-3 py-1.5 bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-sm text-gray-300 rounded-full text-sm font-medium border border-gray-700 hover:border-pink-500/50 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-pink-500/10"
+                className="px-3 py-1.5 bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-sm text-gray-300 rounded-full text-sm font-medium border border-gray-700 hover:border-pink-500/50 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-pink-500/10 flex items-center gap-1"
               >
+                <FaStar className="text-yellow-400 text-xs" />
                 {tech}
               </span>
             ))}
@@ -360,14 +374,14 @@ function Home() {
               href="#projects" 
               className="group px-8 py-3.5 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-2"
             >
-              <FaRocket className="group-hover:rotate-12 transition-transform" />
+              <FaStar className="group-hover:rotate-90 transition-transform duration-300" />
               Explore Work
             </a>
             <button 
               onClick={aboutDialog.open}
               className="group px-8 py-3.5 bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-sm border border-gray-700/50 text-gray-300 font-semibold rounded-xl hover:bg-gray-800/90 hover:border-purple-500/50 transition-all duration-300 flex items-center justify-center gap-2"
             >
-              <FaLayerGroup className="group-hover:scale-110 transition-transform" />
+              <FaStar className="group-hover:scale-110 transition-transform" />
               View Profile
             </button>
           </div>
@@ -388,10 +402,11 @@ function Home() {
                   <FaUser className="text-white text-lg" />
                 </div>
                 <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center">
-                  <span className="text-xs text-white">01</span>
+                  <FaStar className="text-white text-xs" />
                 </div>
               </div>
-              <h2 className="ml-4 text-3xl md:text-4xl font-bold text-white">
+              <h2 className="ml-4 text-3xl md:text-4xl font-bold text-white flex items-center gap-2">
+                <FaStar className="text-yellow-400" />
                 Creative <span className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Journey</span>
               </h2>
             </div>
@@ -412,7 +427,8 @@ function Home() {
                     { label: "Experience", value: "2 Years", color: "from-indigo-500 to-blue-500" },
                   ].map((stat, idx) => (
                     <div key={idx} className="text-center">
-                      <div className={`text-2xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-1`}>
+                      <div className={`text-2xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-1 flex items-center justify-center gap-1`}>
+                        <FaStar className="text-yellow-400" />
                         {stat.value}
                       </div>
                       <div className="text-sm text-gray-400">{stat.label}</div>
@@ -423,7 +439,7 @@ function Home() {
               
               <div className="relative">
                 <h3 className="font-bold text-xl text-white mb-6 flex items-center gap-2">
-                  <FaCode className="text-purple-400" />
+                  <FaStar className="text-yellow-400" />
                   Technical Mastery
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
@@ -435,7 +451,10 @@ function Home() {
                             <span className="text-xl">{skill.icon}</span>
                             <span className="font-medium text-white">{skill.name}</span>
                           </div>
-                          <span className="text-sm font-bold text-white/90">{skill.level}%</span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm font-bold text-white/90">{skill.level}%</span>
+                            <FaStar className="text-yellow-300 text-xs" />
+                          </div>
                         </div>
                         <div className="h-1.5 bg-gray-900/50 rounded-full overflow-hidden">
                           <div 
@@ -456,10 +475,14 @@ function Home() {
         <section id="projects" className="mb-20">
           <div className="text-center mb-12">
             <div className="inline-block px-6 py-2 bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-full border border-pink-500/30 mb-4">
-              <span className="text-sm font-medium text-pink-300">Portfolio</span>
+              <span className="text-sm font-medium text-pink-300 flex items-center gap-1">
+                <FaStar className="text-yellow-400" /> Portfolio
+              </span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 flex items-center justify-center gap-2">
+              <FaStar className="text-yellow-400" />
               Creative <span className="bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">Works</span>
+              <FaStar className="text-yellow-400" />
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Showcasing innovative solutions and elegant implementations
@@ -480,14 +503,16 @@ function Home() {
                   {/* Project Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 relative">
                         <span className="text-2xl">{project.icon}</span>
+                        <FaStar className="absolute -top-1 -right-1 text-yellow-400 text-xs" />
                       </div>
                       <div>
                         <h3 className="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-pink-300 group-hover:to-purple-300 group-hover:bg-clip-text transition-all duration-300">
                           {project.title}
                         </h3>
                         <div className="flex items-center gap-2 mt-1">
+                          <FaStar className="text-yellow-400 text-xs" />
                           <FaExternalLinkAlt className="text-gray-600 group-hover:text-purple-400 transition-colors text-sm" />
                           <span className="text-xs text-gray-500 group-hover:text-gray-400">Live Preview</span>
                         </div>
@@ -505,8 +530,9 @@ function Home() {
                     {project.tech.map((tech, techIdx) => (
                       <span
                         key={techIdx}
-                        className="px-3 py-1 bg-gradient-to-r from-gray-800/80 to-gray-900/80 text-gray-300 text-xs rounded-full border border-gray-700/50 group-hover:border-purple-500/30 transition-colors"
+                        className="px-3 py-1 bg-gradient-to-r from-gray-800/80 to-gray-900/80 text-gray-300 text-xs rounded-full border border-gray-700/50 group-hover:border-purple-500/30 transition-colors flex items-center gap-1"
                       >
+                        <FaStar className="text-yellow-400 text-xs" />
                         {tech}
                       </span>
                     ))}
@@ -519,6 +545,7 @@ function Home() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-gray-800/80 to-gray-900/80 text-gray-300 font-medium rounded-lg border border-gray-700/50 hover:border-pink-500/50 hover:text-white hover:shadow-lg hover:shadow-pink-500/10 transition-all duration-300 group/btn"
                   >
+                    <FaStar className="group-hover/btn:rotate-90 transition-transform" />
                     <span>View Project</span>
                     <FaExternalLinkAlt className="group-hover/btn:translate-x-1 transition-transform" />
                   </a>
@@ -535,10 +562,14 @@ function Home() {
         <section id="certificates" className="mb-20">
           <div className="text-center mb-12">
             <div className="inline-block px-6 py-2 bg-gradient-to-r from-indigo-500/10 to-blue-500/10 rounded-full border border-indigo-500/30 mb-4">
-              <span className="text-sm font-medium text-indigo-300">Achievements</span>
+              <span className="text-sm font-medium text-indigo-300 flex items-center gap-1">
+                <FaStar className="text-yellow-400" /> Achievements
+              </span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 flex items-center justify-center gap-2">
+              <FaStar className="text-yellow-400" />
               Professional <span className="bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent">Credentials</span>
+              <FaStar className="text-yellow-400" />
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Industry-recognized certifications and specialized training
@@ -555,7 +586,7 @@ function Home() {
                   : "bg-gradient-to-r from-gray-800/80 to-gray-900/80 text-gray-300 border border-gray-700/50 hover:border-indigo-500/50"
               }`}
             >
-              <FaCertificate />
+              <FaStar className={certTab === "certificates" ? "text-yellow-300" : "text-yellow-400/50"} />
               Certifications
             </button>
             <button
@@ -566,7 +597,7 @@ function Home() {
                   : "bg-gradient-to-r from-gray-800/80 to-gray-900/80 text-gray-300 border border-gray-700/50 hover:border-indigo-500/50"
               }`}
             >
-              <FaComments />
+              <FaStar className={certTab === "webinars" ? "text-yellow-300" : "text-yellow-400/50"} />
               Webinars
             </button>
           </div>
@@ -586,27 +617,35 @@ function Home() {
                 <div className="p-5">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-blue-500/20 border border-indigo-500/30 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-blue-500/20 border border-indigo-500/30 flex items-center justify-center relative">
                       <FaCertificate className="text-indigo-400" />
+                      <FaStar className="absolute -top-1 -right-1 text-yellow-400 text-xs" />
                     </div>
-                    <span className="px-2 py-1 bg-gradient-to-r from-indigo-500/10 to-blue-500/10 text-indigo-300 text-xs rounded-full border border-indigo-500/30">
+                    <span className="px-2 py-1 bg-gradient-to-r from-indigo-500/10 to-blue-500/10 text-indigo-300 text-xs rounded-full border border-indigo-500/30 flex items-center gap-1">
+                      <FaStar className="text-yellow-400 text-xs" />
                       {cert.category}
                     </span>
                   </div>
 
                   {/* Certificate Details */}
-                  <h3 className="font-bold text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-indigo-300 group-hover:to-blue-300 group-hover:bg-clip-text transition-all duration-300 text-lg mb-2">
+                  <h3 className="font-bold text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-indigo-300 group-hover:to-blue-300 group-hover:bg-clip-text transition-all duration-300 text-lg mb-2 flex items-center gap-2">
+                    <FaStar className="text-yellow-400 text-xs flex-shrink-0" />
                     {cert.name}
                   </h3>
-                  <p className="text-sm text-gray-400 mb-4">{cert.issuer}</p>
+                  <p className="text-sm text-gray-400 mb-4 flex items-center gap-1">
+                    <FaStar className="text-yellow-400/50 text-xs" />
+                    {cert.issuer}
+                  </p>
 
                   {/* Preview Button */}
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors">
+                    <span className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors flex items-center gap-1">
+                      <FaStar className="text-yellow-400/50 text-xs" />
                       Click to preview
                     </span>
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 flex items-center justify-center group-hover:scale-110 transition-transform relative">
                       <FaExternalLinkAlt className="text-gray-500 group-hover:text-indigo-400 transition-colors text-sm" />
+                      <FaStar className="absolute -top-1 -right-1 text-yellow-400 text-xs" />
                     </div>
                   </div>
                 </div>
@@ -627,10 +666,14 @@ function Home() {
             <div className="relative z-10">
               <div className="text-center mb-10">
                 <div className="inline-block px-6 py-2 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 rounded-full border border-pink-500/30 mb-4">
-                  <span className="text-sm font-medium text-pink-300">Get In Touch</span>
+                  <span className="text-sm font-medium text-pink-300 flex items-center gap-1">
+                    <FaStar className="text-yellow-400" /> Get In Touch
+                  </span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 flex items-center justify-center gap-2">
+                  <FaStar className="text-yellow-400" />
                   Let's <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">Collaborate</span>
+                  <FaStar className="text-yellow-400" />
                 </h2>
                 <p className="text-gray-400 max-w-2xl mx-auto">
                   Have a project in mind? I'd love to hear about it
@@ -641,7 +684,7 @@ function Home() {
                 {/* Contact Info with Unique Cards */}
                 <div>
                   <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                    <FaComments className="text-purple-400" />
+                    <FaStar className="text-yellow-400" />
                     Connect With Me
                   </h3>
                   <div className="space-y-4">
@@ -652,22 +695,29 @@ function Home() {
                     ].map((info, idx) => (
                       <div
                         key={idx}
-                        className="group flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300 hover:scale-[1.02]"
+                        className="group flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300 hover:scale-[1.02] relative"
                       >
                         <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${info.color} flex items-center justify-center flex-shrink-0`}>
                           {info.icon}
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm text-gray-400">{info.label}</p>
+                          <p className="text-sm text-gray-400 flex items-center gap-1">
+                            <FaStar className="text-yellow-400 text-xs" />
+                            {info.label}
+                          </p>
                           <p className="text-white font-medium truncate">{info.value}</p>
                         </div>
+                        <FaStar className="absolute -top-1 -right-1 text-yellow-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     ))}
                   </div>
 
                   {/* Social Links with Unique Design */}
                   <div className="mt-8">
-                    <h4 className="text-lg font-bold text-white mb-4">Follow My Journey</h4>
+                    <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                      <FaStar className="text-yellow-400" />
+                      Follow My Journey
+                    </h4>
                     <div className="flex gap-3">
                       {socialLinks.map((link, idx) => (
                         <a
@@ -675,10 +725,11 @@ function Home() {
                           href={link.href}
                           target="_blank"
                           rel="noreferrer"
-                          className={`w-12 h-12 rounded-xl ${link.color} border border-gray-700 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-gray-900/30`}
+                          className={`w-12 h-12 rounded-xl ${link.color} border border-gray-700 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-gray-900/30 relative`}
                           aria-label={link.label}
                         >
                           <span className="text-white text-lg">{link.icon}</span>
+                          <FaStar className="absolute -top-1 -right-1 text-yellow-400 text-xs" />
                         </a>
                       ))}
                     </div>
@@ -694,6 +745,7 @@ function Home() {
                         placeholder="Your Name"
                         className="w-full p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all"
                       />
+                      <FaStar className="absolute right-3 top-1/2 -translate-y-1/2 text-yellow-400/50 text-sm" />
                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-pink-500/50 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <div className="relative">
@@ -702,6 +754,7 @@ function Home() {
                         placeholder="Your Email"
                         className="w-full p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all"
                       />
+                      <FaStar className="absolute right-3 top-1/2 -translate-y-1/2 text-yellow-400/50 text-sm" />
                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <div className="relative">
@@ -710,13 +763,15 @@ function Home() {
                         rows="4"
                         className="w-full p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all resize-none"
                       ></textarea>
+                      <FaStar className="absolute right-3 top-3 text-yellow-400/50 text-sm" />
                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <button
                       type="button"
                       onClick={() => window.location.href = 'mailto:dbodanorossellahmarie@gmail.com'}
-                      className="w-full py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:-translate-y-1"
+                      className="w-full py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-2"
                     >
+                      <FaStar className="group-hover:rotate-90 transition-transform" />
                       Send Message
                     </button>
                   </form>
@@ -733,14 +788,17 @@ function Home() {
           <div className="text-center">
             <div className="inline-block mb-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 flex items-center justify-center">
-                <FaSparkles className="text-pink-400" />
+                <FaStar className="text-yellow-400" />
               </div>
             </div>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 text-sm flex items-center justify-center gap-1">
+              <FaStar className="text-yellow-400 text-xs" />
               © {new Date().getFullYear()} Rossellah Marie Bodaño
             </p>
-            <p className="text-gray-600 text-xs mt-2">
+            <p className="text-gray-600 text-xs mt-2 flex items-center justify-center gap-1">
+              <FaStar className="text-yellow-400/50 text-xs" />
               Crafted with creativity and precision
+              <FaStar className="text-yellow-400/50 text-xs" />
             </p>
           </div>
         </div>
@@ -760,11 +818,19 @@ function Home() {
               alt="Rossellah Marie Bodaño"
               className="relative w-48 h-48 rounded-full border-4 border-gradient-to-r from-pink-500 to-purple-500 shadow-2xl object-cover"
             />
+            <FaStar className="absolute -top-2 -right-2 text-yellow-400 text-xl" />
           </div>
           <div className="text-center">
-            <h3 className="text-2xl font-bold text-white">Rossellah Marie Bodaño</h3>
+            <h3 className="text-2xl font-bold text-white flex items-center justify-center gap-2">
+              Rossellah Marie Bodaño
+              <FaStar className="text-yellow-400" />
+            </h3>
             <p className="text-transparent bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text font-medium">Frontend Developer & UI/UX Specialist</p>
-            <p className="text-gray-300 mt-3">Information Technology Student</p>
+            <p className="text-gray-300 mt-3 flex items-center justify-center gap-1">
+              <FaStar className="text-yellow-400 text-xs" />
+              Information Technology Student
+              <FaStar className="text-yellow-400 text-xs" />
+            </p>
           </div>
         </div>
       </Dialog>
@@ -777,11 +843,15 @@ function Home() {
       >
         {selectedCert && (
           <div className="flex flex-col items-center gap-6">
-            <img
-              src={selectedCert}
-              alt="Certificate"
-              className="w-full max-h-[60vh] object-contain rounded-lg border border-gray-700"
-            />
+            <div className="relative">
+              <img
+                src={selectedCert}
+                alt="Certificate"
+                className="w-full max-h-[60vh] object-contain rounded-lg border border-gray-700"
+              />
+              <FaStar className="absolute -top-2 -left-2 text-yellow-400 text-xl" />
+              <FaStar className="absolute -bottom-2 -right-2 text-yellow-400 text-xl" />
+            </div>
             <div className="flex gap-3">
               <a
                 href={selectedCert}
@@ -789,12 +859,14 @@ function Home() {
                 rel="noopener noreferrer"
                 className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-indigo-500/25 transition-all duration-300 flex items-center gap-2"
               >
+                <FaStar className="text-yellow-300" />
                 <FaDownload /> Download
               </a>
               <button
                 onClick={certificateDialog.close}
-                className="px-5 py-2.5 bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-800/70 transition-all duration-300"
+                className="px-5 py-2.5 bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-800/70 transition-all duration-300 flex items-center gap-2"
               >
+                <FaStar className="text-yellow-400/50" />
                 Close
               </button>
             </div>
@@ -809,6 +881,11 @@ function Home() {
         title="Creative Journey"
       >
         <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <FaStar className="text-yellow-400" />
+            <FaStar className="text-yellow-400" />
+            <FaStar className="text-yellow-400" />
+          </div>
           <p className="text-gray-300 leading-relaxed">
             As a passionate Information Technology student from Gaddani, Tayum, Abra, I merge academic excellence with creative web development. My approach focuses on crafting digital experiences that are both visually stunning and functionally robust.
           </p>
@@ -816,25 +893,29 @@ function Home() {
             Specializing in modern web technologies, I transform ideas into responsive, intuitive applications. With expertise in front-end development and expanding into full-stack capabilities, I deliver solutions that prioritize user experience and technical excellence.
           </p>
           <div className="pt-4 border-t border-gray-800">
-            <h4 className="text-white font-medium mb-2">Creative Philosophy:</h4>
+            <h4 className="text-white font-medium mb-2 flex items-center gap-2">
+              <FaStar className="text-yellow-400" />
+              Creative Philosophy:
+            </h4>
             <ul className="text-gray-300 space-y-2">
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500"></div>
-                Pixel-perfect UI/UX implementation
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500"></div>
-                Responsive, mobile-first design approach
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500"></div>
-                Modern JavaScript ecosystem expertise
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500"></div>
-                Clean, maintainable code architecture
-              </li>
+              {[
+                "Pixel-perfect UI/UX implementation",
+                "Responsive, mobile-first design approach",
+                "Modern JavaScript ecosystem expertise",
+                "Clean, maintainable code architecture",
+                "Continuous learning and innovation"
+              ].map((item, idx) => (
+                <li key={idx} className="flex items-center gap-2">
+                  <FaStar className="text-yellow-400 text-xs" />
+                  {item}
+                </li>
+              ))}
             </ul>
+          </div>
+          <div className="flex items-center justify-center gap-2 pt-4">
+            <FaStar className="text-yellow-400 animate-pulse" />
+            <FaStar className="text-yellow-400 animate-pulse" />
+            <FaStar className="text-yellow-400 animate-pulse" />
           </div>
         </div>
       </Dialog>
