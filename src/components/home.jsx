@@ -371,7 +371,7 @@ function Home() {
             <div className="inline-block px-6 py-2 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-full border border-cyan-500/30 mb-6 backdrop-blur-sm">
               <span className="text-sm font-mono tracking-widest text-cyan-300">
                 <FaRocket className="inline mr-2" />
-                BIST STUDENT
+                BSIT STUDENT
               </span>
             </div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 tracking-tight">
