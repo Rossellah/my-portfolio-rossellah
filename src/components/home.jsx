@@ -25,9 +25,17 @@ import {
   FaGitAlt,
   FaFigma,
   FaStar,
-  FaImage
+  FaImage,
+  FaRocket,
+  FaLightbulb,
+  FaPaintBrush,
+  FaPalette,
+  FaMagic,
+  FaBolt,
+  FaFire,
+  FaMeteor
 } from "react-icons/fa";
-import { SiTailwindcss } from "react-icons/si";
+import { SiTailwindcss, SiTypescript, SiNextdotjs, SiVercel, SiNetlify } from "react-icons/si";
 import { Dialog, useDialog } from "./Dialog";
 
 function Home() {
@@ -35,13 +43,14 @@ function Home() {
   const [active, setActive] = useState("home");
   const [scrolled, setScrolled] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [particles, setParticles] = useState([]);
   const profileDialog = useDialog();
   const [selectedCert, setSelectedCert] = useState(null);
   const certificateDialog = useDialog();
   const [certTab, setCertTab] = useState("certificates");
   const aboutDialog = useDialog();
-  const [selectedProject, setSelectedProject] = useState(null);
-  const projectDialog = useDialog();
+  const [glitchEffect, setGlitchEffect] = useState(false);
+  const [isHoveringHero, setIsHoveringHero] = useState(false);
 
   // Handle scroll effect for navbar
   useEffect(() => {
@@ -61,164 +70,232 @@ function Home() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Close mobile menu when clicking outside
+  // Create floating particles
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuOpen && !e.target.closest('nav')) {
-        setMenuOpen(false);
+    const newParticles = [];
+    for (let i = 0; i < 50; i++) {
+      newParticles.push({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 3 + 1,
+        speed: Math.random() * 2 + 0.5,
+        opacity: Math.random() * 0.5 + 0.1,
+        color: [
+          'from-pink-500/40 via-purple-500/40 to-blue-500/40',
+          'from-cyan-500/40 via-blue-500/40 to-purple-500/40',
+          'from-yellow-500/40 via-orange-500/40 to-red-500/40',
+          'from-green-500/40 via-emerald-500/40 to-teal-500/40'
+        ][Math.floor(Math.random() * 4)]
+      });
+    }
+    setParticles(newParticles);
+  }, []);
+
+  // Animate particles
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setParticles(prev => prev.map(p => ({
+        ...p,
+        y: (p.y + p.speed) % 100,
+        x: (p.x + Math.sin(Date.now() * 0.001 + p.id) * 0.1) % 100
+      })));
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Glitch effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (Math.random() > 0.7) {
+        setGlitchEffect(true);
+        setTimeout(() => setGlitchEffect(false), 100);
       }
-    };
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, [menuOpen]);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Handle image errors
   const handleImageError = (e) => {
-    e.target.src = `https://ui-avatars.com/api/?name=Rossellah+Bodano&background=7c3aed&color=fff&bold=true&size=200`;
+    e.target.src = `https://ui-avatars.com/api/?name=Rossellah+Bodano&background=linear-gradient(45deg,#ff6b6b,#ffa726,#ffee58,#51cf66,#339af0)&color=fff&bold=true&size=200`;
   };
 
   const handleCertError = (e) => {
-    e.target.src = `https://via.placeholder.com/600x400/0f172a/334155?text=Certificate+Image`;
+    e.target.src = `https://via.placeholder.com/800x600/0a0a0a/ff6b6b?text=Certificate+Preview`;
   };
 
   const handleProjectError = (e) => {
-    e.target.src = `https://via.placeholder.com/600x400/0f172a/334155?text=Project+Image`;
+    e.target.src = `https://via.placeholder.com/800x600/0a0a0a/339af0?text=Project+Showcase`;
   };
 
   // Function to handle certificate download
   const handleCertificateDownload = (certificateUrl) => {
     if (!certificateUrl) return;
     
-    // Create a temporary anchor element
     const link = document.createElement('a');
     link.href = certificateUrl;
-    
-    // Extract filename from URL or use default
     const fileName = certificateUrl.split('/').pop() || 'certificate';
     link.download = fileName;
-    
-    // Append to body, trigger click, and remove
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
-    // Close the dialog after download
     certificateDialog.close();
   };
 
   const navItems = [
-    { label: "Home", section: "home" },
-    { label: "About", section: "about" },
-    { label: "Skills", section: "skills" },
-    { label: "Projects", section: "projects" },
-    { label: "Certificates", section: "certificates" },
-    { label: "Contact", section: "contact" },
+    { label: "HOME", section: "home", icon: <FaRocket /> },
+    { label: "ABOUT", section: "about", icon: <FaUser /> },
+    { label: "SKILLS", section: "skills", icon: <FaBolt /> },
+    { label: "PROJECTS", section: "projects", icon: <FaCode /> },
+    { label: "CERTIFICATES", section: "certificates", icon: <FaCertificate /> },
+    { label: "CONTACT", section: "contact", icon: <FaComments /> },
   ];
 
   const skills = [
-    { name: "HTML", level: 95, icon: <FaHtml5 />, color: "bg-gradient-to-br from-orange-500 to-red-600" },
-    { name: "CSS", level: 90, icon: <FaCss3Alt />, color: "bg-gradient-to-br from-blue-500 to-indigo-600" },
-    { name: "JavaScript", level: 88, icon: <FaJs />, color: "bg-gradient-to-br from-yellow-500 to-amber-600" },
-    { name: "React", level: 85, icon: <FaReact />, color: "bg-gradient-to-br from-cyan-500 to-blue-600" },
-    { name: "Tailwind CSS", level: 92, icon: <SiTailwindcss />, color: "bg-gradient-to-br from-teal-500 to-emerald-600" },
-    { name: "Python", level: 80, icon: <FaPython />, color: "bg-gradient-to-br from-blue-600 to-purple-700" },
-    { name: "Git", level: 85, icon: <FaGitAlt />, color: "bg-gradient-to-br from-orange-600 to-red-600" },
-    { name: "Figma", level: 75, icon: <FaFigma />, color: "bg-gradient-to-br from-pink-500 to-purple-600" },
+    { name: "HTML5", level: 95, icon: <FaHtml5 />, color: "from-orange-500 via-red-500 to-pink-500" },
+    { name: "CSS3", level: 90, icon: <FaCss3Alt />, color: "from-blue-500 via-indigo-500 to-purple-500" },
+    { name: "JavaScript", level: 88, icon: <FaJs />, color: "from-yellow-500 via-amber-500 to-orange-500" },
+    { name: "React", level: 85, icon: <FaReact />, color: "from-cyan-500 via-blue-500 to-indigo-500" },
+    { name: "Tailwind", level: 92, icon: <SiTailwindcss />, color: "from-teal-500 via-emerald-500 to-green-500" },
+    { name: "TypeScript", level: 75, icon: <SiTypescript />, color: "from-blue-600 via-indigo-600 to-purple-600" },
+    { name: "Next.js", level: 80, icon: <SiNextdotjs />, color: "from-gray-800 via-gray-900 to-black" },
+    { name: "Python", level: 80, icon: <FaPython />, color: "from-blue-600 via-purple-600 to-indigo-600" },
+    { name: "Git", level: 85, icon: <FaGitAlt />, color: "from-orange-600 via-red-600 to-rose-600" },
+    { name: "Figma", level: 75, icon: <FaFigma />, color: "from-pink-500 via-purple-500 to-fuchsia-500" },
+    { name: "UI/UX", level: 88, icon: <FaPaintBrush />, color: "from-purple-500 via-pink-500 to-rose-500" },
+    { name: "Vercel", level: 82, icon: <SiVercel />, color: "from-gray-900 via-black to-gray-800" },
   ];
 
   const socialLinks = [
-    { icon: <FaFacebook />, href: "https://facebook.com/rossellah.07", label: "Facebook", color: "bg-gradient-to-br from-blue-600 to-blue-800" },
-    { icon: <FaTiktok />, href: "https://tiktok.com/@_sellang/", label: "TikTok", color: "bg-gradient-to-br from-black to-gray-800" },
-    { icon: <FaTelegram />, href: "https://t.me/lhengiee/", label: "Telegram", color: "bg-gradient-to-br from-blue-500 to-cyan-600" },
-    { icon: <FaGithub />, href: "https://github.com/Rossellah", label: "GitHub", color: "bg-gradient-to-br from-gray-800 to-gray-900" },
-    { icon: <FaLinkedin />, href: "https://www.linkedin.com/in/rossellah-marie-boda%C3%B1o-2195b7349", label: "LinkedIn", color: "bg-gradient-to-br from-blue-700 to-blue-900" },
+    { icon: <FaFacebook />, href: "https://facebook.com/rossellah.07", label: "Facebook", color: "from-blue-600 via-blue-700 to-blue-800" },
+    { icon: <FaTiktok />, href: "https://tiktok.com/@_sellang/", label: "TikTok", color: "from-black via-gray-900 to-gray-800" },
+    { icon: <FaTelegram />, href: "https://t.me/lhengiee/", label: "Telegram", color: "from-blue-500 via-cyan-500 to-blue-400" },
+    { icon: <FaGithub />, href: "https://github.com/Rossellah", label: "GitHub", color: "from-gray-800 via-gray-900 to-black" },
+    { icon: <FaLinkedin />, href: "https://www.linkedin.com/in/rossellah-marie-boda%C3%B1o-2195b7349", label: "LinkedIn", color: "from-blue-700 via-blue-800 to-blue-900" },
   ];
 
-  // Fallback profile image URL
   const profileImageUrl = "lhengie.jpg";
-  const profileFallbackUrl = `https://ui-avatars.com/api/?name=Rossellah+Bodano&background=7c3aed&color=fff&bold=true&size=200`;
 
   return (
-    <div id="home" className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100 font-sans overflow-x-hidden relative">
-      {/* Glittery Background - Simplified */}
+    <div id="home" className="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-950 text-gray-100 font-sans overflow-x-hidden relative">
+      {/* Cosmic Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {/* Subtle gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 via-purple-500/5 to-indigo-500/5"></div>
-        
-        {/* Interactive Gradient */}
+        {/* Nebula Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-pink-900/20"></div>
+          <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-cyan-500/10 via-transparent to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-pink-500/10 via-transparent to-transparent"></div>
+        </div>
+
+        {/* Animated Particles */}
+        {particles.map(p => (
+          <div
+            key={p.id}
+            className={`absolute w-${Math.ceil(p.size)} h-${Math.ceil(p.size)} bg-gradient-to-br ${p.color} rounded-full animate-pulse`}
+            style={{
+              left: `${p.x}%`,
+              top: `${p.y}%`,
+              opacity: p.opacity,
+              animationDuration: `${1 + Math.random() * 2}s`,
+              animationDelay: `${p.id * 0.1}s`,
+            }}
+          />
+        ))}
+
+        {/* Interactive Light */}
         <div 
-          className="absolute inset-0 opacity-20 pointer-events-none transition-all duration-300"
+          className="absolute inset-0 opacity-30 pointer-events-none transition-all duration-300"
           style={{
-            background: `radial-gradient(600px at ${mousePosition.x}px ${mousePosition.y}px, rgba(120, 119, 198, 0.15), transparent 80%)`,
+            background: `radial-gradient(800px at ${mousePosition.x}px ${mousePosition.y}px, rgba(147, 51, 234, 0.3), transparent 70%)`,
           }}
         ></div>
-        
-        {/* Subtle Grid Pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-                             linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: '50px 50px'
-          }}></div>
+
+        {/* Grid Pattern with Animation */}
+        <div className="absolute inset-0 opacity-10">
+          <div 
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+                               linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+              backgroundSize: '50px 50px',
+              animation: 'gridMove 20s linear infinite',
+            }}
+          ></div>
         </div>
+
+        {/* Light Beams */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-cyan-500/5 via-transparent to-pink-500/5 rounded-full blur-3xl animate-spin-slow"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/5 via-transparent to-blue-500/5 rounded-full blur-3xl animate-spin-slow animation-delay-1000"></div>
       </div>
 
-      {/* Navigation Bar */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? "bg-gray-900/95 backdrop-blur-xl py-3 shadow-2xl" : "bg-transparent py-6"
+      {/* Navigation Bar - Futuristic Design */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
+        scrolled ? "bg-black/90 backdrop-blur-2xl py-3 border-b border-cyan-500/20 shadow-2xl shadow-cyan-500/10" : "bg-transparent py-6"
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
-            {/* Logo/Brand - Removed icon, just name */}
+            {/* Logo with Glitch Effect */}
             <div className="group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-              <div className="flex flex-col">
-                <h1 className="font-bold text-xl bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300 bg-clip-text text-transparent">
-                  MY PORTFOLIO
-                </h1>
-                <span className="text-xs text-gray-400 hidden sm:block">Creative Developer</span>
+              <div className="relative">
+                <div className={`absolute inset-0 bg-gradient-to-r from-cyan-500 to-pink-500 blur-xl opacity-30 transition-opacity duration-500 group-hover:opacity-60 ${glitchEffect ? 'animate-pulse' : ''}`}></div>
+                <div className="relative flex flex-col">
+                  <h1 className="font-bold text-2xl bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    MY PORTFOLIO<sup className="text-lg">†</sup>
+                  </h1>
+                  <span className="text-xs text-cyan-300/60 font-mono tracking-widest hidden sm:block">CREATIVE DEVELOPER</span>
+                </div>
               </div>
             </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-1">
+            {/* Desktop Navigation - Futuristic */}
+            <div className="hidden md:flex items-center space-x-2">
               {navItems.map((item) => (
                 <a
                   key={item.section}
                   href={`#${item.section}`}
                   onClick={() => setActive(item.section)}
-                  className={`relative px-4 py-2 font-medium transition-all duration-300 group ${
+                  className={`relative px-5 py-2.5 font-mono text-sm tracking-widest transition-all duration-500 group overflow-hidden ${
                     active === item.section 
                       ? "text-white" 
-                      : "text-gray-400 hover:text-white"
+                      : "text-gray-400 hover:text-cyan-300"
                   }`}
                 >
-                  <span className="text-sm">{item.label}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="text-cyan-400/50 group-hover:text-cyan-300 transition-colors">
+                      {item.icon}
+                    </span>
+                    {item.label}
+                  </span>
                   {active === item.section && (
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full"></div>
+                    <>
+                      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"></div>
+                      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 blur-sm"></div>
+                    </>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -skew-x-12"></div>
                 </a>
               ))}
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button - Futuristic */}
             <button
-              className="md:hidden text-gray-300 hover:text-white p-2"
+              className="md:hidden text-gray-300 hover:text-cyan-300 p-2 relative group"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
-              <div className={`relative w-6 h-6 transition-all duration-300 ${menuOpen ? 'rotate-180' : ''}`}>
-                <div className={`absolute w-full h-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full transition-all duration-300 ${menuOpen ? 'top-1/2 rotate-45' : 'top-1'}`}></div>
-                <div className={`absolute w-full h-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full top-1/2 -translate-y-1/2 transition-all duration-300 ${menuOpen ? 'opacity-0' : 'opacity-100'}`}></div>
-                <div className={`absolute w-full h-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full transition-all duration-300 ${menuOpen ? 'top-1/2 -rotate-45' : 'bottom-1'}`}></div>
+              <div className={`relative w-8 h-8 transition-all duration-500 ${menuOpen ? 'rotate-180' : ''}`}>
+                <div className={`absolute w-full h-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full transition-all duration-500 ${menuOpen ? 'top-1/2 rotate-45' : 'top-2'}`}></div>
+                <div className={`absolute w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full top-1/2 -translate-y-1/2 transition-all duration-500 ${menuOpen ? 'opacity-0' : 'opacity-100'}`}></div>
+                <div className={`absolute w-full h-0.5 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full transition-all duration-500 ${menuOpen ? 'top-1/2 -rotate-45' : 'bottom-2'}`}></div>
               </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
           </div>
 
-          {/* Mobile Navigation */}
+          {/* Mobile Navigation - Futuristic */}
           {menuOpen && (
-            <div className="md:hidden mt-4 bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-800 animate-slideDown overflow-hidden">
-              <div className="p-2">
+            <div className="md:hidden mt-4 bg-black/90 backdrop-blur-2xl rounded-2xl border border-cyan-500/20 shadow-2xl shadow-cyan-500/10 animate-slideDown overflow-hidden">
+              <div className="p-2 space-y-1">
                 {navItems.map((item) => (
                   <a
                     key={item.section}
@@ -227,12 +304,13 @@ function Home() {
                       setMenuOpen(false);
                       setActive(item.section);
                     }}
-                    className={`flex items-center justify-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-300 mb-1 last:mb-0 ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg font-mono text-sm tracking-wider transition-all duration-300 ${
                       active === item.section
-                        ? "bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-white border border-pink-500/30"
-                        : "text-gray-300 hover:text-white hover:bg-gray-800/50"
+                        ? "bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 text-white border border-cyan-500/30"
+                        : "text-gray-300 hover:text-white hover:bg-gray-900/50 border border-transparent hover:border-cyan-500/20"
                     }`}
                   >
+                    <span className="text-cyan-400">{item.icon}</span>
                     <span>{item.label}</span>
                   </a>
                 ))}
@@ -242,391 +320,488 @@ function Home() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 relative z-10">
-        {/* Hero Section */}
-        <header className="text-center mb-20 relative">
-          {/* Decorative Elements */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 rounded-full blur-3xl -z-10"></div>
-          
-          {/* Profile Image */}
-          <div className="relative inline-block mb-8 group cursor-pointer" onClick={profileDialog.open}>
-            <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-full animate-spin-slow opacity-30 blur-xl"></div>
-            <div className="relative rounded-full p-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
-              <div className="relative rounded-full overflow-hidden border-4 border-gray-900 w-32 h-32 sm:w-40 sm:h-40 md:w-52 md:h-52">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20 relative z-10">
+        {/* Hero Section - Futuristic */}
+        <header 
+          className="text-center mb-32 relative"
+          onMouseEnter={() => setIsHoveringHero(true)}
+          onMouseLeave={() => setIsHoveringHero(false)}
+        >
+          {/* Holographic Effect */}
+          <div className={`absolute inset-0 -z-10 transition-all duration-1000 ${
+            isHoveringHero ? 'opacity-30' : 'opacity-10'
+          }`}>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-full blur-3xl animate-pulse"></div>
+          </div>
+
+          {/* Profile Image with Holographic Effect */}
+          <div className="relative inline-block mb-12 group cursor-pointer" onClick={profileDialog.open}>
+            {/* Outer Rings */}
+            <div className="absolute inset-0 animate-spin-slow">
+              <div className="absolute inset-[-20px] border-4 border-transparent border-t-cyan-500 border-r-purple-500 border-b-pink-500 border-l-cyan-500 rounded-full"></div>
+              <div className="absolute inset-[-30px] border-4 border-transparent border-t-purple-500 border-r-pink-500 border-b-cyan-500 border-l-purple-500 rounded-full animate-spin-slow animation-delay-1000"></div>
+            </div>
+            
+            {/* Image Container */}
+            <div className="relative rounded-full p-2 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 animate-gradient-border">
+              <div className="relative rounded-full overflow-hidden border-4 border-black/50 w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 group-hover:scale-110 transition-transform duration-700">
                 <img
                   src={profileImageUrl}
                   alt="Rossellah Marie Bodaño"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
                   onError={handleImageError}
                 />
-                {/* Gradient Overlay on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-pink-500/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                {/* Holographic Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-cyan-500/20 via-transparent to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
             </div>
+
+            {/* Floating Elements */}
+            <div className="absolute -top-4 -right-4 w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 flex items-center justify-center animate-float">
+              <FaStar className="text-white text-sm" />
+            </div>
+            <div className="absolute -bottom-4 -left-4 w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center animate-float animation-delay-500">
+              <FaMagic className="text-white text-sm" />
+            </div>
           </div>
           
-          {/* Name */}
-          <div className="mb-6 px-4">
-            <div className="inline-block px-4 py-2 bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-full border border-pink-500/30 mb-4">
-              <span className="text-sm font-medium text-pink-300">
-                INFORMATION TECHNOLOGY STUDENT
+          {/* Name with Glitch Effect */}
+          <div className="mb-8 px-4 relative">
+            <div className="inline-block px-6 py-2 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-full border border-cyan-500/30 mb-6 backdrop-blur-sm">
+              <span className="text-sm font-mono tracking-widest text-cyan-300">
+                <FaRocket className="inline mr-2" />
+                BIST STUDENT
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3">
-              <span className="block mb-2 text-gray-300">I'm</span>
-              <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent animate-gradient">
-                Rossellah Marie Bodaño
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 tracking-tight">
+              <span className="block mb-2 text-gray-400 font-light">HELLO, I'M</span>
+              <span className={`bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent ${
+                glitchEffect ? 'animate-glitch' : ''
+              }`}>
+                ROSSELLAH MARIE BODAÑO
               </span>
             </h1>
+            <div className="text-lg sm:text-xl md:text-2xl text-gray-300 font-mono tracking-wider">
+              <span className="text-cyan-300">FRONTEND DEVELOPER</span>
+             
+            </div>
           </div>
           
-          {/* Tagline */}
-          <div className="relative inline-block mb-8 px-4">
-            <p className="text-base sm:text-lg md:text-xl text-gray-300 font-medium px-4 sm:px-6 py-3 bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/50 shadow-lg">
-              <span className="text-pink-300">Frontend Developer</span>
-              <span className="text-gray-400 mx-2">•</span>
-              <span className="text-purple-300">UI/UX Specialist</span>
-            </p>
+          {/* Dynamic Tagline */}
+          <div className="relative inline-block mb-10 px-4">
+            <div className="relative px-6 py-4 bg-gradient-to-r from-black/40 via-gray-900/40 to-black/40 backdrop-blur-xl rounded-2xl border border-cyan-500/20 shadow-2xl shadow-cyan-500/10 overflow-hidden">
+              <p className="text-base sm:text-lg text-gray-300 font-medium">
+                <FaLightbulb className="inline mr-2 text-yellow-400 animate-pulse" />
+                <span className="text-cyan-300">Transforming</span> ideas into{" "}
+                <span className="text-purple-300">digital experiences</span> that{" "}
+                <span className="text-pink-300">inspire</span>
+              </p>
+              {/* Animated Border */}
+              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
+            </div>
           </div>
           
-          {/* Tech Stack */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8 max-w-2xl mx-auto px-4">
-            {["React Ecosystem", "Modern JavaScript", "Responsive Design", "UI/UX Principles", "Web Performance", "Creative Coding"].map((tech, idx) => (
-              <span
+          {/* Tech Orbital */}
+          <div className="flex flex-wrap justify-center gap-3 mb-12 max-w-3xl mx-auto px-4">
+            {["REACT ECOSYSTEM", "MODERN JS", "UI/UX", "WEBGL", "ANIMATIONS", "PERFORMANCE", "RESPONSIVE", "CLOUD"].map((tech, idx) => (
+              <div
                 key={idx}
-                className="px-3 py-1.5 bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-sm text-gray-300 rounded-full text-xs sm:text-sm font-medium border border-gray-700 hover:border-pink-500/50 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-pink-500/10"
+                className="relative group"
               >
-                {tech}
-              </span>
+                <span className="relative px-4 py-2.5 bg-gradient-to-r from-gray-900/80 to-black/80 backdrop-blur-sm text-gray-300 rounded-full text-xs sm:text-sm font-mono tracking-wider border border-cyan-500/30 hover:border-purple-500/50 transition-all duration-300 cursor-pointer overflow-hidden">
+                  {tech}
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-cyan-500/5 group-hover:via-purple-500/5 group-hover:to-pink-500/5 transition-all duration-500"></div>
+                </span>
+              </div>
             ))}
           </div>
           
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row justify-center gap-4 px-4">
+          {/* CTA Buttons - Futuristic */}
+          <div className="flex flex-col sm:flex-row justify-center gap-5 px-4">
             <a 
               href="#projects" 
-              className="group px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-2"
+              className="group relative px-8 py-4 bg-gradient-to-r from-cyan-600 via-purple-600 to-pink-600 text-white font-bold rounded-xl hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-500 transform hover:-translate-y-1 flex items-center justify-center gap-3 text-sm sm:text-base tracking-wider overflow-hidden"
             >
-              Explore Work
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-cyan-500/20 group-hover:via-purple-500/20 group-hover:to-pink-500/20 transition-all duration-500"></div>
+              <FaRocket className="text-lg animate-bounce group-hover:animate-spin" />
+              EXPLORE UNIVERSE
             </a>
             <button 
               onClick={aboutDialog.open}
-              className="group px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-sm border border-gray-700/50 text-gray-300 font-semibold rounded-xl hover:bg-gray-800/90 hover:border-purple-500/50 transition-all duration-300 flex items-center justify-center gap-2"
+              className="group relative px-8 py-4 bg-gradient-to-r from-gray-900/80 to-black/80 backdrop-blur-sm border border-cyan-500/30 text-gray-300 font-bold rounded-xl hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 flex items-center justify-center gap-3 text-sm sm:text-base tracking-wider overflow-hidden"
             >
-              View Profile
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-cyan-500/10 group-hover:via-purple-500/10 group-hover:to-pink-500/10 transition-all duration-500"></div>
+              <FaUser className="text-lg" />
+              VIEW PROFILE
             </button>
           </div>
         </header>
 
-        {/* About Section */}
+        {/* About Section - Futuristic */}
         <section
           id="about"
-          className="mb-20 relative group px-4 sm:px-0"
+          className="mb-32 relative group"
         >
-          <div className="bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-900/20 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-gray-800/50 shadow-2xl">
-            <div className="flex items-center mb-8">
+          {/* Section Background */}
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 blur-sm"></div>
+          </div>
+
+          <div className="bg-gradient-to-br from-gray-900/40 via-black/40 to-gray-900/40 backdrop-blur-2xl rounded-3xl p-8 sm:p-12 border border-cyan-500/20 shadow-2xl shadow-cyan-500/10 relative overflow-hidden">
+            {/* Animated Background Elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-cyan-500/5 via-transparent to-pink-500/5 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-500/5 via-transparent to-cyan-500/5 rounded-full blur-3xl"></div>
+
+            <div className="flex items-center mb-12">
               <div className="relative">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shadow-lg">
-                  <FaUser className="text-white text-lg" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                  <FaUser className="text-white text-xl" />
                 </div>
+                <div className="absolute -inset-2 border-2 border-cyan-500/30 rounded-2xl animate-ping"></div>
               </div>
-              <h2 className="ml-4 text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-                Creative <span className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Journey</span>
+              <h2 className="ml-6 text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight">
+                <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">COSMIC</span>{" "}
+                <span className="text-gray-300">JOURNEY</span>
               </h2>
             </div>
             
-            <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
-              <div className="space-y-4">
+            <div className="grid lg:grid-cols-2 gap-10">
+              <div className="space-y-6">
+                <p className="text-gray-300 leading-relaxed text-lg sm:text-xl">
+                  <span className="text-cyan-300 font-bold">Digital Visionary</span> from Gaddani, Tayum, Abra, specializing in creating immersive web experiences that blend <span className="text-purple-300">cutting-edge technology</span> with <span className="text-pink-300">artistic expression</span>.
+                </p>
                 <p className="text-gray-300 leading-relaxed text-base sm:text-lg">
-                  Passionate Information Technology student from Gaddani, Tayum, Abra, specializing in crafting digital experiences that blend aesthetic elegance with functional excellence.
+                  With expertise in the modern web stack, I transform <span className="text-cyan-300">abstract concepts</span> into <span className="text-purple-300">tangible digital realities</span>. Continuously pushing boundaries towards full-stack excellence while maintaining <span className="text-pink-300">flawless execution</span>.
                 </p>
-                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                  With expertise spanning modern web technologies, I transform conceptual visions into responsive, intuitive applications. Continuously expanding my skill set towards full-stack development while maintaining a commitment to clean, efficient code.
-                </p>
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-4">
+                {/* Stats - Futuristic */}
+                <div className="grid grid-cols-3 gap-6 pt-8">
                   {[
-                    { label: "Projects", value: "10+", color: "from-pink-500 to-rose-500" },
-                    { label: "Technologies", value: "8+", color: "from-purple-500 to-indigo-500" },
-                    { label: "Experience", value: "2 Years", color: "from-indigo-500 to-blue-500" },
+                    { label: "PROJECTS", value: "15+", color: "from-cyan-500 to-blue-500", icon: <FaCode /> },
+                    { label: "TECH STACK", value: "12+", color: "from-purple-500 to-pink-500", icon: <FaBolt /> },
+                    { label: "EXPERIENCE", value: "3YRS", color: "from-pink-500 to-rose-500", icon: <FaFire /> },
                   ].map((stat, idx) => (
-                    <div key={idx} className="text-center">
-                      <div className={`text-xl sm:text-2xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-1`}>
+                    <div key={idx} className="text-center group">
+                      <div className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${stat.color} mx-auto mb-3 flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                        <span className="text-white text-2xl">{stat.icon}</span>
+                        <div className="absolute inset-0 border-2 border-white/20 rounded-2xl animate-pulse"></div>
+                      </div>
+                      <div className={`text-2xl sm:text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-2`}>
                         {stat.value}
                       </div>
-                      <div className="text-xs sm:text-sm text-gray-400">{stat.label}</div>
+                      <div className="text-xs sm:text-sm text-gray-400 tracking-widest font-mono">{stat.label}</div>
                     </div>
                   ))}
                 </div>
               </div>
               
               <div className="relative">
-                <h3 className="font-bold text-lg sm:text-xl text-white mb-6">
-                  Technical Mastery
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  {skills.map((skill, idx) => (
-                    <div key={idx} className="group relative">
-                      <div className={`p-3 sm:p-4 rounded-xl ${skill.color} border border-gray-800/50 hover:border-white/30 transition-all duration-300 group-hover:scale-[1.02]`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2 sm:gap-3">
-                            <span className="text-lg sm:text-xl text-white">{skill.icon}</span>
-                            <span className="font-medium text-white text-sm sm:text-base">{skill.name}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <span className="text-xs sm:text-sm font-bold text-white/90">{skill.level}%</span>
-                          </div>
-                        </div>
-                        <div className="h-1.5 bg-gray-900/50 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-gradient-to-r from-white/80 to-white rounded-full transition-all duration-1000"
-                            style={{ width: `${skill.level}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+  <h3 className="font-bold text-2xl sm:text-3xl text-white mb-8 tracking-wider">
+    <FaBolt className="inline mr-3 text-cyan-400" />
+    SKILLS
+  </h3>
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    {skills.map((skill, idx) => (
+      <div key={idx} className="group relative">
+        <div className={`p-4 rounded-2xl bg-gradient-to-br ${skill.color} border border-white/10 hover:border-white/30 transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-xl group-hover:shadow-purple-500/20`}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <span className="text-xl sm:text-2xl text-white">{skill.icon}</span>
+              <span className="font-bold text-white text-sm sm:text-base tracking-wide">{skill.name}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-xs sm:text-sm font-bold text-white/90">{skill.level}%</span>
+            </div>
+          </div>
+          <div className="h-2 bg-black/30 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-white to-white/80 rounded-full transition-all duration-1000"
+              style={{ width: `${skill.level}%` }}
+            ></div>
+          </div>
+          {/* Glow effect on hover */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-purple-500/0 to-pink-500/0 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
             </div>
           </div>
         </section>
 
-        {/* Projects Section - Darker with glow effect */}
-        <section id="projects" className="mb-20 px-4 sm:px-0 scroll-mt-24">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <div className="inline-block px-6 py-2 bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-full border border-pink-500/30 mb-4">
-                <span className="text-sm font-medium text-pink-300">
-                  Portfolio
+        {/* Projects Section - Futuristic Grid */}
+        <section id="projects" className="mb-32 scroll-mt-24">
+          <div className="max-w-7xl mx-auto">
+            {/* Section Header */}
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-3 px-6 py-2.5 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-full border border-cyan-500/30 mb-6 backdrop-blur-sm">
+                <FaRocket className="text-cyan-300 text-sm" />
+                <span className="text-sm font-mono tracking-widest text-cyan-300">
+                  PORTFOLIO
                 </span>
               </div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">
-                Creative <span className="bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">Works</span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+                <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">DIGITAL</span>{" "}
+                <span className="text-gray-300">CREATIONS</span>
               </h2>
-              <p className="text-gray-400 max-w-2xl mx-auto text-sm sm:text-base">
-                Showcasing innovative solutions and elegant implementations
+              <p className="text-gray-400 max-w-2xl mx-auto text-base sm:text-lg font-light">
+                Showcasing innovative solutions and boundary-pushing implementations
               </p>
             </div>
 
-            {/* Projects Grid - Darker with subtle glow */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10">
+            {/* Projects Grid - Futuristic */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {[
                 {
-                  title: "Converter Website",
-                  desc: "A simple web application that allows users to convert Philippine peso (PHP) into other currencies, such as US Dollar (USD), Chinese Yuan (CNY), and Japanese Yen (JPY)",
+                  title: "QUANTUM CONVERTER",
+                  desc: "Advanced currency conversion platform with real-time rates and predictive analytics",
                   img: "converter.png",
                   url: "converter-activity/index.html",
-                  tech: ["HTML5", "CSS3", "JavaScript"]
+                  tech: ["HTML5", "CSS3", "JS", "API"],
+                  glow: "from-cyan-500/20 to-blue-500/20"
                 },
                 {
-                  title: "Calculator Website",
-                  desc: "A calculator built with JavaScript that performs basic arithmetic operations.",
+                  title: "CALCULATOR NEXUS",
+                  desc: "Scientific calculator with advanced functions and responsive design",
                   img: "calculator.png",
                   url: "Calculator/index.html",
-                  tech: ["JavaScript", "CSS Grid", "Responsive"]
+                  tech: ["JS", "ALGORITHMS", "UI/UX"],
+                  glow: "from-purple-500/20 to-pink-500/20"
                 },
                 {
-                  title: "Loop Analysis Tool",
-                  desc: "A loop that lets you input a number and can see the sum, factorial, odd, and even numbers using JavaScript.",
+                  title: "LOOP ANALYTICS",
+                  desc: "Mathematical analysis tool for sequence processing and pattern recognition",
                   img: "loop.png",
                   url: "Loop/index.html",
-                  tech: ["JavaScript", "Algorithms", "DOM"]
+                  tech: ["JS", "DATA", "VISUALIZATION"],
+                  glow: "from-pink-500/20 to-rose-500/20"
                 },
                 {
-                  title: "To Do List Website",
-                  desc: "A React-based to-do list app for daily goals. Users can create, update, delete, and mark tasks as done.",
+                  title: "TASK ORBIT",
+                  desc: "AI-powered task management system with intelligent scheduling",
                   imgs: ["todo.png", "list.png"],
                   url: "https://to-do-client-brown.vercel.app/",
-                  tech: ["React", "LocalStorage", "Tailwind"]
+                  tech: ["REACT", "AI", "CLOUD"],
+                  glow: "from-blue-500/20 to-cyan-500/20"
                 },
                 {
-                  title: "Employee Management",
-                  desc: "Employee Management is an employee list system that uses JavaScript arrays and objects to store, manage, and display employee information.",
+                  title: "EMPLOYEE MATRIX",
+                  desc: "Enterprise management system with advanced data structures",
                   imgs: ["array.png", "ray.png"],
                   url: "Array Objects/index.html",
-                  tech: ["JavaScript", "Data Structures", "UI/UX"]
+                  tech: ["JS", "DATA", "SYSTEMS"],
+                  glow: "from-green-500/20 to-emerald-500/20"
                 }
               ].map((project, index) => (
                 <div
                   key={index}
-                  className="group bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-900/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-800/50 shadow-xl transition-all duration-500 cursor-pointer overflow-hidden relative hover:border-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/5"
+                  className="group relative bg-gradient-to-br from-gray-900/50 via-black/50 to-gray-900/50 backdrop-blur-xl rounded-3xl p-6 border border-cyan-500/20 shadow-xl transition-all duration-700 cursor-pointer overflow-hidden hover:scale-[1.02] hover:border-purple-500/40 hover:shadow-2xl hover:shadow-cyan-500/10"
                   onClick={() => window.open(project.url, "_blank")}
                 >
-                  {/* Subtle background glow on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-pink-500/0 to-indigo-500/0 rounded-2xl opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
+                  {/* Animated Background Glow */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${project.glow} opacity-0 group-hover:opacity-30 transition-opacity duration-700 rounded-3xl`}></div>
+                  
+                  {/* Project Number */}
+                  <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                    <span className="text-cyan-300 text-sm font-mono">0{index + 1}</span>
+                  </div>
                   
                   <div className="relative">
                     {/* Project Image */}
                     {project.img ? (
-                      <img
-                        src={project.img}
-                        alt={project.title}
-                        className="rounded-xl mb-5 w-full h-48 sm:h-52 object-cover border border-gray-700/50 group-hover:border-purple-500/20 transition-all duration-500"
-                        onError={handleProjectError}
-                      />
+                      <div className="relative rounded-2xl mb-6 overflow-hidden border border-gray-700/50 group-hover:border-cyan-500/30 transition-all duration-500">
+                        <img
+                          src={project.img}
+                          alt={project.title}
+                          className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-700"
+                          onError={handleProjectError}
+                        />
+                        {/* Overlay Gradient */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-70 group-hover:opacity-50 transition-opacity duration-500"></div>
+                      </div>
                     ) : (
-                      <div className="flex gap-3 overflow-x-auto scroll-smooth mb-5">
+                      <div className="flex gap-4 overflow-x-auto scroll-smooth mb-6">
                         {project.imgs.map((img, i) => (
-                          <img
-                            key={i}
-                            src={img}
-                            className="rounded-xl w-60 h-48 object-cover border border-gray-700/50 group-hover:border-purple-500/20 transition-all duration-500 flex-shrink-0"
-                            alt={`Slide ${i + 1}`}
-                            onError={handleProjectError}
-                          />
+                          <div key={i} className="relative rounded-2xl overflow-hidden border border-gray-700/50 group-hover:border-cyan-500/30 transition-all duration-500 flex-shrink-0">
+                            <img
+                              src={img}
+                              className="w-80 h-56 object-cover group-hover:scale-105 transition-transform duration-700"
+                              alt={`Slide ${i + 1}`}
+                              onError={handleProjectError}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-70 group-hover:opacity-50 transition-opacity duration-500"></div>
+                          </div>
                         ))}
                       </div>
                     )}
 
-                    {/* Project Title with glow effect */}
-                    <h3 className="text-lg sm:text-xl font-bold mb-3 text-white group-hover:text-white/90 transition-colors duration-300 group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.3)]">
+                    {/* Project Title */}
+                    <h3 className="text-xl sm:text-2xl font-bold mb-3 text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-500 tracking-wider">
                       {project.title}
                     </h3>
 
                     {/* Project Description */}
-                    <p className="mb-4 text-gray-300 text-sm sm:text-base leading-relaxed group-hover:text-gray-200 transition-colors duration-300">
+                    <p className="mb-5 text-gray-300 text-sm sm:text-base leading-relaxed group-hover:text-gray-200 transition-colors duration-300">
                       {project.desc}
                     </p>
 
-                    {/* Tech Tags - Darker with subtle glow */}
-                    <div className="flex flex-wrap gap-2 mb-5">
+                    {/* Tech Tags - Futuristic */}
+                    <div className="flex flex-wrap gap-2 mb-6">
                       {project.tech.map((tech, techIdx) => (
                         <span
                           key={techIdx}
-                          className="px-3 py-1.5 bg-gradient-to-r from-gray-800/70 to-gray-900/70 text-gray-300 text-xs rounded-lg border border-gray-700/50 group-hover:border-purple-500/20 group-hover:text-gray-200 group-hover:bg-gray-800/80 transition-all duration-300"
+                          className="px-3 py-1.5 bg-gradient-to-r from-gray-800/70 to-black/70 text-gray-300 text-xs rounded-lg border border-cyan-500/20 group-hover:border-purple-500/30 group-hover:text-cyan-300 group-hover:bg-gray-800/80 transition-all duration-300 tracking-wider font-mono"
                         >
                           {tech}
                         </span>
                       ))}
                     </div>
 
-                    {/* View Project Link with glow */}
+                    {/* View Project Link */}
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-400 font-medium text-sm group-hover:text-purple-300 group-hover:drop-shadow-[0_0_6px_rgba(168,85,247,0.4)] transition-all duration-300 flex items-center gap-2">
+                      <span className="text-gray-400 font-medium text-sm group-hover:text-cyan-300 group-hover:tracking-wider transition-all duration-300 flex items-center gap-2">
                         <FaExternalLinkAlt className="text-xs" />
-                        View Project
+                        LAUNCH PROJECT
                       </span>
-                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-gray-800/70 to-gray-900/70 border border-gray-700/50 flex items-center justify-center group-hover:border-purple-500/30 group-hover:bg-gray-800/80 transition-all duration-300">
-                        <FaExternalLinkAlt className="text-gray-400 group-hover:text-purple-300 text-xs" />
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-800/70 to-black/70 border border-cyan-500/20 flex items-center justify-center group-hover:border-purple-500/30 group-hover:bg-gray-800/80 group-hover:rotate-90 transition-all duration-500">
+                        <FaExternalLinkAlt className="text-gray-400 group-hover:text-cyan-300 text-xs" />
                       </div>
                     </div>
                   </div>
 
-                  {/* Subtle bottom border glow */}
-                  <div className="absolute bottom-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  {/* Animated Border */}
+                  <div className="absolute bottom-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Certificates Section - Darker with subtle glow */}
-        <section id="certificates" className="mb-20 px-4 sm:px-0">
-          <div className="text-center mb-12">
-            <div className="inline-block px-6 py-2 bg-gradient-to-r from-indigo-500/10 to-blue-500/10 rounded-full border border-indigo-500/30 mb-4">
-              <span className="text-sm font-medium text-indigo-300">
-                Achievements
+        {/* Certificates Section - Futuristic Gallery */}
+        <section id="certificates" className="mb-32">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-3 px-6 py-2.5 bg-gradient-to-r from-indigo-500/10 via-blue-500/10 to-cyan-500/10 rounded-full border border-indigo-500/30 mb-6 backdrop-blur-sm">
+              <FaCertificate className="text-indigo-300 text-sm" />
+              <span className="text-sm font-mono tracking-widest text-indigo-300">
+                CREDENTIALS
               </span>
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">
-              Professional <span className="bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent">Credentials</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+              <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">DIGITAL</span>{" "}
+              <span className="text-gray-300">CERTIFICATES</span>
             </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto text-sm sm:text-base">
-              Industry-recognized certifications and specialized training
+            <p className="text-gray-400 max-w-2xl mx-auto text-base sm:text-lg font-light">
+              Industry-recognized certifications and specialized achievements
             </p>
           </div>
 
-          {/* Tab Navigation - Darker */}
-          <div className="flex gap-2 justify-center mb-10 flex-wrap">
+          {/* Tab Navigation - Futuristic */}
+          <div className="flex gap-3 justify-center mb-12 flex-wrap">
             <button
               onClick={() => setCertTab("certificates")}
-              className={`px-4 sm:px-8 py-2.5 sm:py-3.5 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 text-sm sm:text-base ${
+              className={`px-6 sm:px-10 py-3 rounded-xl font-mono text-sm tracking-wider transition-all duration-500 flex items-center gap-3 ${
                 certTab === "certificates"
-                  ? "bg-gradient-to-r from-gray-900/80 to-gray-900/90 text-white border border-indigo-500/30 shadow-lg shadow-indigo-500/20"
-                  : "bg-gradient-to-r from-gray-800/70 to-gray-900/70 text-gray-300 border border-gray-700/50 hover:border-indigo-500/30 hover:text-gray-200"
+                  ? "bg-gradient-to-r from-indigo-600/20 via-blue-600/20 to-cyan-600/20 text-white border border-cyan-500/30 shadow-lg shadow-cyan-500/20"
+                  : "bg-gradient-to-r from-gray-800/70 to-black/70 text-gray-300 border border-gray-700/50 hover:border-cyan-500/30 hover:text-cyan-300"
               }`}
             >
-              Certifications
+              <FaCertificate className="text-sm" />
+              CERTIFICATIONS
             </button>
             <button
               onClick={() => setCertTab("webinars")}
-              className={`px-4 sm:px-8 py-2.5 sm:py-3.5 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 text-sm sm:text-base ${
+              className={`px-6 sm:px-10 py-3 rounded-xl font-mono text-sm tracking-wider transition-all duration-500 flex items-center gap-3 ${
                 certTab === "webinars"
-                  ? "bg-gradient-to-r from-gray-900/80 to-gray-900/90 text-white border border-indigo-500/30 shadow-lg shadow-indigo-500/20"
-                  : "bg-gradient-to-r from-gray-800/70 to-gray-900/70 text-gray-300 border border-gray-700/50 hover:border-indigo-500/30 hover:text-gray-200"
+                  ? "bg-gradient-to-r from-indigo-600/20 via-blue-600/20 to-cyan-600/20 text-white border border-cyan-500/30 shadow-lg shadow-cyan-500/20"
+                  : "bg-gradient-to-r from-gray-800/70 to-black/70 text-gray-300 border border-gray-700/50 hover:border-cyan-500/30 hover:text-cyan-300"
               }`}
             >
-              Webinars
+              <FaComments className="text-sm" />
+              WEBINARS
             </button>
           </div>
 
-          {/* Certificates Tab - Darker cards */}
+          {/* Certificates Grid - Futuristic */}
           {certTab === "certificates" && (
-            <div className="max-w-screen-lg mx-auto px-4 sm:px-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 justify-items-center">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[
                   {
-                    name: "AI Fundamentals with IBM SkillsBuild",
+                    name: "AI FUNDAMENTALS",
+                    subtitle: "IBM SkillsBuild",
                     file: "AI-Fundamentals-IBM.png",
-                    type: "image"
+                    color: "from-cyan-500/20 to-blue-500/20"
                   },
                   {
-                    name: "Apply AI - Analyze Customer Reviews",
+                    name: "APPLY AI",
+                    subtitle: "Customer Reviews Analysis",
                     file: "Apply-AI.png",
-                    type: "image"
+                    color: "from-purple-500/20 to-pink-500/20"
                   },
                   {
-                    name: "Apply AI - Update Your Resume",
+                    name: "AI RESUME BUILDER",
+                    subtitle: "Smart Career Tools",
                     file: "AI-Update-Your-Resume.png",
-                    type: "image"
+                    color: "from-pink-500/20 to-rose-500/20"
                   },
                   {
-                    name: "Python Certificate",
+                    name: "PYTHON MASTERY",
+                    subtitle: "Advanced Programming",
                     file: "python.png",
-                    type: "image"
+                    color: "from-blue-500/20 to-indigo-500/20"
                   },
                   {
-                    name: "Data Certificate",
+                    name: "DATA SCIENCE",
+                    subtitle: "Analytics & Processing",
                     file: "data.png",
-                    type: "image"
+                    color: "from-green-500/20 to-emerald-500/20"
                   },
                   {
-                    name: "AI Certificate",
+                    name: "AI ENGINEER",
+                    subtitle: "Machine Learning",
                     file: "aii.png",
-                    type: "image"
+                    color: "from-orange-500/20 to-red-500/20"
                   }
                 ].map((cert, index) => (
                   <div
                     key={index}
-                    className="group w-full max-w-xs mx-auto rounded-2xl border border-gray-700/50 bg-gradient-to-br from-gray-900/70 to-gray-900/80 p-4 shadow-lg transition-all duration-500 cursor-pointer hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5"
+                    className="group relative rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-gray-900/50 via-black/50 to-gray-900/50 backdrop-blur-xl p-5 shadow-xl transition-all duration-700 cursor-pointer hover:scale-[1.03] hover:border-cyan-500/40 hover:shadow-2xl hover:shadow-cyan-500/10"
                     onClick={() => {
                       setSelectedCert(cert.file);
                       certificateDialog.open();
                     }}
                   >
-                    {/* Certificate image container with dark overlay */}
-                    <div className="relative rounded-lg overflow-hidden mb-4 border border-gray-700/50 group-hover:border-indigo-500/20 transition-all duration-300">
+                    {/* Background Glow */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${cert.color} opacity-0 group-hover:opacity-30 transition-opacity duration-700 rounded-3xl`}></div>
+                    
+                    {/* Certificate Image */}
+                    <div className="relative rounded-2xl overflow-hidden mb-5 border border-gray-700/50 group-hover:border-cyan-500/30 transition-all duration-500">
                       <img
                         src={cert.file}
                         alt={cert.name}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-700"
                         onError={handleCertError}
                       />
-                      {/* Dark overlay on image */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/40 to-transparent opacity-70 group-hover:opacity-60 transition-opacity duration-300"></div>
+                      {/* Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500"></div>
+                      {/* Badge Number */}
+                      <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500/30 to-purple-500/30 border border-cyan-500/50 flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">{index + 1}</span>
+                      </div>
                     </div>
                     
-                    {/* Certificate name with subtle glow */}
-                    <p className="text-sm font-semibold text-gray-300 text-center group-hover:text-indigo-300 group-hover:drop-shadow-[0_0_6px_rgba(99,102,241,0.3)] transition-all duration-300">
-                      {cert.name}
-                    </p>
-                    
-                    {/* View text with glow */}
-                    <div className="text-center mt-3">
-                      <span className="text-xs text-gray-500 group-hover:text-indigo-400 transition-colors duration-300">
-                        Click to view
-                      </span>
+                    {/* Certificate Info */}
+                    <div className="relative text-center">
+                      <p className="text-lg font-bold text-white mb-1 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-500">
+                        {cert.name}
+                      </p>
+                      <p className="text-sm text-gray-400 mb-3">{cert.subtitle}</p>
+                      <div className="text-xs text-cyan-400 tracking-widest font-mono group-hover:tracking-wider transition-all duration-300">
+                        CLICK TO VIEW
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -634,47 +809,49 @@ function Home() {
             </div>
           )}
 
-          {/* Webinars Tab - Darker cards */}
+          {/* Webinars Grid */}
           {certTab === "webinars" && (
-            <div className="max-w-screen-lg mx-auto px-4 sm:px-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 justify-items-center">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[
                   {
-                    name: "Digital Safety & Cybersecurity",
+                    name: "CYBER SECURITY",
+                    subtitle: "Digital Safety Protocol",
                     file: "lheng-digital-safety.jpg",
-                    type: "image"
+                    color: "from-cyan-500/20 to-blue-500/20"
                   }
                 ].map((webinar, index) => (
                   <div
                     key={index}
-                    className="group w-full max-w-xs mx-auto rounded-2xl border border-gray-700/50 bg-gradient-to-br from-gray-900/70 to-gray-900/80 p-4 shadow-lg transition-all duration-500 cursor-pointer hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5"
+                    className="group relative rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-gray-900/50 via-black/50 to-gray-900/50 backdrop-blur-xl p-5 shadow-xl transition-all duration-700 cursor-pointer hover:scale-[1.03] hover:border-cyan-500/40 hover:shadow-2xl hover:shadow-cyan-500/10"
                     onClick={() => {
                       setSelectedCert(webinar.file);
                       certificateDialog.open();
                     }}
                   >
-                    {/* Webinar image container with dark overlay */}
-                    <div className="relative rounded-lg overflow-hidden mb-4 border border-gray-700/50 group-hover:border-indigo-500/20 transition-all duration-300">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${webinar.color} opacity-0 group-hover:opacity-30 transition-opacity duration-700 rounded-3xl`}></div>
+                    
+                    <div className="relative rounded-2xl overflow-hidden mb-5 border border-gray-700/50 group-hover:border-cyan-500/30 transition-all duration-500">
                       <img
                         src={webinar.file}
                         alt={webinar.name}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-700"
                         onError={handleCertError}
                       />
-                      {/* Dark overlay on image */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/40 to-transparent opacity-70 group-hover:opacity-60 transition-opacity duration-300"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500"></div>
+                      <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500/30 to-purple-500/30 border border-cyan-500/50 flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">★</span>
+                      </div>
                     </div>
                     
-                    {/* Webinar name with subtle glow */}
-                    <p className="text-sm font-semibold text-gray-300 text-center group-hover:text-indigo-300 group-hover:drop-shadow-[0_0_6px_rgba(99,102,241,0.3)] transition-all duration-300">
-                      {webinar.name}
-                    </p>
-                    
-                    {/* View text with glow */}
-                    <div className="text-center mt-3">
-                      <span className="text-xs text-gray-500 group-hover:text-indigo-400 transition-colors duration-300">
-                        Click to view
-                      </span>
+                    <div className="relative text-center">
+                      <p className="text-lg font-bold text-white mb-1 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-500">
+                        {webinar.name}
+                      </p>
+                      <p className="text-sm text-gray-400 mb-3">{webinar.subtitle}</p>
+                      <div className="text-xs text-cyan-400 tracking-widest font-mono group-hover:tracking-wider transition-all duration-300">
+                        CLICK TO VIEW
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -683,53 +860,55 @@ function Home() {
           )}
         </section>
 
-        {/* Contact Section - Fixed Responsive Issues */}
-        <section id="contact" className="mb-16 px-4 sm:px-0">
-          <div className="bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-900/20 backdrop-blur-xl rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-800/50 shadow-2xl overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute top-0 right-0 w-32 h-32 sm:w-64 sm:h-64 bg-gradient-to-br from-pink-500/10 via-purple-500/10 to-indigo-500/10 rounded-full blur-3xl -z-10"></div>
+        {/* Contact Section - Futuristic */}
+        <section id="contact" className="mb-20">
+          <div className="bg-gradient-to-br from-gray-900/40 via-black/40 to-gray-900/40 backdrop-blur-2xl rounded-3xl p-6 sm:p-10 border border-cyan-500/20 shadow-2xl shadow-cyan-500/10 overflow-hidden relative">
+            {/* Animated Background */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-cyan-500/10 via-transparent to-purple-500/10 rounded-full blur-3xl animate-spin-slow"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-500/10 via-transparent to-pink-500/10 rounded-full blur-3xl animate-spin-slow animation-delay-1000"></div>
             
             <div className="relative z-10">
-              <div className="text-center mb-6 sm:mb-8 lg:mb-10">
-                <div className="inline-block px-4 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 rounded-full border border-pink-500/30 mb-3 sm:mb-4">
-                  <span className="text-xs sm:text-sm font-medium text-pink-300">
-                    Get In Touch
+              <div className="text-center mb-10">
+                <div className="inline-flex items-center gap-3 px-6 py-2.5 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-full border border-cyan-500/30 mb-6 backdrop-blur-sm">
+                  <FaComments className="text-cyan-300 text-sm" />
+                  <span className="text-sm font-mono tracking-widest text-cyan-300">
+                    CONNECT
                   </span>
                 </div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3">
-                  Let's <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">Collaborate</span>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+                  <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">LET'S</span>{" "}
+                  <span className="text-gray-300">CREATE</span>
                 </h2>
-                <p className="text-gray-400 max-w-2xl mx-auto text-xs sm:text-sm lg:text-base px-2">
-                  Have a project in mind? I'd love to hear about it
+                <p className="text-gray-400 max-w-2xl mx-auto text-base sm:text-lg font-light">
+                  Ready to bring your digital vision to life?
                 </p>
               </div>
 
-              <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-                {/* Contact Info - Fixed for mobile */}
+              <div className="grid lg:grid-cols-2 gap-8 sm:gap-12">
+                {/* Contact Info - Futuristic */}
                 <div>
-                  <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white mb-4 sm:mb-6">
-                    Connect With Me
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-8 tracking-wider">
+                    <FaBolt className="inline mr-3 text-cyan-400" />
+                    CONNECT WITH ME
                   </h3>
-                  <div className="space-y-3 sm:space-y-4">
+                  <div className="space-y-5">
                     {[
-                      { icon: <FaEnvelope />, label: "Email", value: "dbodanorossellahmarie@gmail.com", color: "from-pink-500 to-rose-500" },
-                      { icon: <FaPhoneAlt />, label: "Phone", value: "09603458372", color: "from-purple-500 to-indigo-500" },
-                      { icon: <FaMapMarkerAlt />, label: "Location", value: "Gaddani, Tayum, Abra", color: "from-indigo-500 to-blue-500" },
+                      { icon: <FaEnvelope />, label: "EMAIL", value: "dbodanorossellahmarie@gmail.com", color: "from-cyan-500 to-blue-500" },
+                      { icon: <FaPhoneAlt />, label: "PHONE", value: "+63 960 345 8372", color: "from-purple-500 to-pink-500" },
+                      { icon: <FaMapMarkerAlt />, label: "LOCATION", value: "Gaddani, Tayum, Abra, Philippines", color: "from-pink-500 to-rose-500" },
                     ].map((info, idx) => (
                       <div
                         key={idx}
-                        className="group flex items-start sm:items-center gap-2 sm:gap-3 lg:gap-4 p-2.5 sm:p-3 lg:p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300 hover:scale-[1.02]"
+                        className="group flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-cyan-500/20 hover:border-purple-500/30 transition-all duration-500 hover:scale-[1.02]"
                       >
-                        <div className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg bg-gradient-to-br ${info.color} flex items-center justify-center flex-shrink-0`}>
-                          <span className="text-sm sm:text-base lg:text-lg text-white">
-                            {info.icon}
-                          </span>
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${info.color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-500`}>
+                          <span className="text-white text-lg">{info.icon}</span>
                         </div>
-                        <div className="flex-1 min-w-0"> {/* Added min-w-0 to prevent overflow */}
-                          <p className="text-xs sm:text-sm text-gray-400">
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-400 tracking-widest font-mono">
                             {info.label}
                           </p>
-                          <p className="text-white font-medium text-sm sm:text-base lg:text-lg truncate hover:text-clip hover:whitespace-normal">
+                          <p className="text-white font-medium text-sm sm:text-base truncate hover:text-clip hover:whitespace-normal">
                             {info.value}
                           </p>
                         </div>
@@ -737,61 +916,62 @@ function Home() {
                     ))}
                   </div>
 
-                  {/* Social Links - Fixed for mobile */}
-                  <div className="mt-6 sm:mt-8">
-                    <h4 className="text-sm sm:text-base lg:text-lg font-bold text-white mb-3 sm:mb-4">
-                      Follow My Journey
+                  {/* Social Links - Futuristic */}
+                  <div className="mt-10">
+                    <h4 className="text-lg sm:text-xl font-bold text-white mb-6 tracking-wider">
+                      FOLLOW THE JOURNEY
                     </h4>
-                    <div className="flex gap-1.5 sm:gap-2 lg:gap-3 flex-wrap">
+                    <div className="flex gap-3">
                       {socialLinks.map((link, idx) => (
                         <a
                           key={idx}
                           href={link.href}
                           target="_blank"
                           rel="noreferrer"
-                          className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl ${link.color} border border-gray-700 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-gray-900/30 flex-shrink-0`}
+                          className={`w-12 h-12 rounded-xl bg-gradient-to-br ${link.color} border border-gray-700 flex items-center justify-center transition-all duration-500 hover:scale-125 hover:shadow-2xl hover:shadow-cyan-500/30`}
                           aria-label={link.label}
                         >
-                          <span className="text-white text-sm sm:text-base lg:text-lg">{link.icon}</span>
+                          <span className="text-white text-lg">{link.icon}</span>
                         </a>
                       ))}
                     </div>
                   </div>
                 </div>
 
-                {/* Contact Form - Fixed for mobile */}
-                <div className="mt-4 sm:mt-0">
-                  <form className="space-y-3 sm:space-y-4">
+                {/* Contact Form - Futuristic */}
+                <div>
+                  <form className="space-y-5">
                     <div className="relative">
                       <input
                         type="text"
-                        placeholder="Your Name"
-                        className="w-full p-2.5 sm:p-3 lg:p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 text-white placeholder-gray-500 focus:outline-none focus:ring-1 sm:focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all text-sm sm:text-base"
+                        placeholder="YOUR NAME"
+                        className="w-full p-4 rounded-2xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-cyan-500/20 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-sm tracking-wider font-mono"
                       />
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-pink-500/50 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
+                      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <div className="relative">
                       <input
                         type="email"
-                        placeholder="Your Email"
-                        className="w-full p-2.5 sm:p-3 lg:p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 text-white placeholder-gray-500 focus:outline-none focus:ring-1 sm:focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all text-sm sm:text-base"
+                        placeholder="YOUR EMAIL"
+                        className="w-full p-4 rounded-2xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-cyan-500/20 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-sm tracking-wider font-mono"
                       />
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
+                      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <div className="relative">
                       <textarea
-                        placeholder="Your Message"
-                        rows="3"
-                        className="w-full p-2.5 sm:p-3 lg:p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 text-white placeholder-gray-500 focus:outline-none focus:ring-1 sm:focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all resize-none text-sm sm:text-base"
+                        placeholder="YOUR MESSAGE"
+                        rows="4"
+                        className="w-full p-4 rounded-2xl bg-gradient-to-r from-gray-900/50 to-black/50 border border-cyan-500/20 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 resize-none text-sm tracking-wider font-mono"
                       ></textarea>
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
+                      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-500/50 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <button
                       type="button"
                       onClick={() => window.location.href = 'mailto:dbodanorossellahmarie@gmail.com'}
-                      className="w-full py-2.5 sm:py-3 lg:py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-xl sm:hover:shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-2 text-sm sm:text-base"
+                      className="w-full py-4 bg-gradient-to-r from-cyan-600 via-purple-600 to-pink-600 text-white font-bold rounded-2xl hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-500 transform hover:-translate-y-1 flex items-center justify-center gap-3 text-sm tracking-wider"
                     >
-                      Send Message
+                      <FaRocket className="text-lg" />
+                      LAUNCH MESSAGE
                     </button>
                   </form>
                 </div>
@@ -801,108 +981,144 @@ function Home() {
         </section>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-800/30 bg-gray-900/20 backdrop-blur-xl py-4 sm:py-6 lg:py-8">
+      {/* Footer - Futuristic */}
+      <footer className="border-t border-cyan-500/20 bg-black/50 backdrop-blur-2xl py-8 sm:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="inline-block mb-3 sm:mb-4">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 flex items-center justify-center">
-                <FaCode className="text-pink-400 text-xs sm:text-sm lg:text-base" />
+            <div className="inline-flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 flex items-center justify-center">
+                <FaCode className="text-cyan-400 text-base" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-bold text-xl bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                  ROSSEL
+                </h3>
+                <p className="text-xs text-gray-500 font-mono tracking-widest">DIGITAL ARTISAN</p>
               </div>
             </div>
-            <p className="text-gray-500 text-xs sm:text-sm">
-              © {new Date().getFullYear()} Rossellah Marie Bodaño
+            <p className="text-gray-500 text-xs sm:text-sm tracking-wider font-mono mb-2">
+              © {new Date().getFullYear()} ROSSELLAH MARIE BODAÑO
             </p>
-            <p className="text-gray-600 text-xs mt-1 sm:mt-2">
-              Crafted with creativity and precision
+            <p className="text-gray-600 text-xs tracking-widest font-mono">
+              CRAFTED WITH <FaFire className="inline text-orange-500" /> AND <FaBolt className="inline text-yellow-500" />
             </p>
           </div>
         </div>
       </footer>
 
-      {/* Profile Dialog */}
+      {/* Profile Dialog - Futuristic */}
       <Dialog
         isOpen={profileDialog.isOpen}
         onClose={profileDialog.close}
-        title="Profile Overview"
+        title={
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-500 flex items-center justify-center">
+              <FaUser className="text-white text-sm" />
+            </div>
+            <span className="text-white font-bold tracking-wider">DIGITAL PROFILE</span>
+          </div>
+        }
+        className="bg-gradient-to-br from-gray-900/90 via-black/90 to-gray-900/90 border border-cyan-500/20 backdrop-blur-2xl"
       >
-        <div className="flex flex-col items-center gap-3 sm:gap-4 lg:gap-6">
+        <div className="flex flex-col items-center gap-6 sm:gap-8">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-full animate-spin-slow opacity-20 blur-xl"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-full animate-spin-slow opacity-20 blur-xl"></div>
             <img
               src={profileImageUrl}
               alt="Rossellah Marie Bodaño"
-              className="relative w-24 h-24 sm:w-32 sm:h-32 lg:w-48 lg:h-48 rounded-full border-4 border-gray-900 shadow-2xl object-cover"
+              className="relative w-32 h-32 sm:w-48 sm:h-48 rounded-full border-4 border-black shadow-2xl object-cover"
               onError={handleImageError}
             />
           </div>
           <div className="text-center">
-            <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
-              Rossellah Marie Bodaño
+            <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+              ROSSELLAH MARIE BODAÑO
             </h3>
-            <p className="text-transparent bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text font-medium text-xs sm:text-sm lg:text-base">Frontend Developer & UI/UX Specialist</p>
-            <p className="text-gray-300 mt-2 sm:mt-3 text-xs sm:text-sm lg:text-base">
-              Information Technology Student
+            <p className="text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text font-bold text-sm sm:text-base tracking-wider mb-3">
+              DIGITAL ARTISAN & CREATIVE DEVELOPER
             </p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-full border border-cyan-500/30">
+              <span className="text-cyan-300 text-xs sm:text-sm font-mono tracking-wider">
+                IT STUDENT • FRONTEND SPECIALIST
+              </span>
+            </div>
           </div>
         </div>
       </Dialog>
 
-      {/* Certificate Dialog - Updated with download only */}
+      {/* Certificate Dialog - Futuristic */}
       <Dialog
         isOpen={certificateDialog.isOpen}
         onClose={certificateDialog.close}
-        title="Certificate Preview"
+        title={
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center">
+              <FaCertificate className="text-white text-sm" />
+            </div>
+            <span className="text-white font-bold tracking-wider">CERTIFICATES</span>
+          </div>
+        }
+        className="bg-gradient-to-br from-gray-900/90 via-black/90 to-gray-900/90 border border-cyan-500/20 backdrop-blur-2xl"
       >
         {selectedCert && (
-          <div className="flex flex-col items-center gap-3 sm:gap-4 lg:gap-6">
-            <div className="relative">
+          <div className="flex flex-col items-center gap-6 sm:gap-8">
+            <div className="relative rounded-2xl overflow-hidden border border-cyan-500/30">
               <img
                 src={selectedCert}
                 alt="Certificate"
-                className="w-full max-h-[40vh] sm:max-h-[50vh] lg:max-h-[60vh] object-contain rounded-lg border border-gray-700"
+                className="w-full max-h-[50vh] sm:max-h-[60vh] object-contain"
                 onError={handleCertError}
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
             </div>
-            <div className="flex gap-2 sm:gap-3 flex-wrap justify-center">
+            <div className="flex gap-4">
               <button
                 onClick={() => handleCertificateDownload(selectedCert)}
-                className="px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-indigo-500/25 transition-all duration-300 flex items-center gap-2 text-xs sm:text-sm lg:text-base hover:scale-105 active:scale-95"
+                className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-xl hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-300 flex items-center gap-3 text-sm tracking-wider hover:scale-105"
               >
-                <FaDownload className="text-xs sm:text-sm" /> Download Certificate
+                <FaDownload className="text-sm" /> DOWNLOAD CERTIFICATE
               </button>
             </div>
           </div>
         )}
       </Dialog>
 
-      {/* About Dialog */}
+      {/* About Dialog - Futuristic */}
       <Dialog
         isOpen={aboutDialog.isOpen}
         onClose={aboutDialog.close}
-        title="Creative Journey"
+        title={
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+              <FaBolt className="text-white text-sm" />
+            </div>
+            <span className="text-white font-bold tracking-wider">ABOUT ME</span>
+          </div>
+        }
+        className="bg-gradient-to-br from-gray-900/90 via-black/90 to-gray-900/90 border border-cyan-500/20 backdrop-blur-2xl"
       >
-        <div className="space-y-3 sm:space-y-4">
-          <p className="text-gray-300 leading-relaxed text-xs sm:text-sm lg:text-base">
-            As a passionate Information Technology student from Gaddani, Tayum, Abra, I merge academic excellence with creative web development. My approach focuses on crafting digital experiences that are both visually stunning and functionally robust.
+        <div className="space-y-6">
+          <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+            As a <span className="text-cyan-300 font-bold">visionary developer</span> from Gaddani, Tayum, Abra, I merge <span className="text-purple-300">technical precision</span> with <span className="text-pink-300">artistic innovation</span> to create digital experiences that transcend expectations.
           </p>
-          <p className="text-gray-300 leading-relaxed text-xs sm:text-sm lg:text-base">
-            Specializing in modern web technologies, I transform ideas into responsive, intuitive applications. With expertise in front-end development and expanding into full-stack capabilities, I deliver solutions that prioritize user experience and technical excellence.
+          <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+            Specializing in the cutting edge of web technology, I transform <span className="text-cyan-300">abstract concepts</span> into <span className="text-purple-300">immersive realities</span>. With expertise spanning front-end mastery and expanding into full-stack frontiers, I deliver solutions that prioritize <span className="text-pink-300">user delight</span> and <span className="text-cyan-300">technical excellence</span>.
           </p>
-          <div className="pt-3 sm:pt-4 border-t border-gray-800">
-            <h4 className="text-white font-medium mb-1.5 sm:mb-2 text-sm sm:text-base lg:text-lg">
-              Creative Philosophy:
+          <div className="pt-6 border-t border-cyan-500/20">
+            <h4 className="text-white font-bold mb-4 text-lg tracking-wider flex items-center gap-2">
+              <FaMagic className="text-purple-400" />
+              MY PRINCIPLES:
             </h4>
-            <ul className="text-gray-300 space-y-1.5 sm:space-y-2 text-xs sm:text-sm lg:text-base">
+            <ul className="text-gray-300 space-y-3 text-sm sm:text-base">
               {[
-                "Pixel-perfect UI/UX implementation",
-                "Responsive, mobile-first design approach",
-                "Modern JavaScript ecosystem expertise",
-                "Clean, maintainable code architecture",
-                "Continuous learning and innovation"
+                "Pixel-perfect implementation with artistic flair",
+                "Responsive, mobile-first approach with futuristic design",
+                "Modern JavaScript ecosystem with bleeding-edge tools",
+                "Clean, scalable architecture with performance optimization",
+                "Continuous innovation with boundary-pushing creativity"
               ].map((item, idx) => (
-                <li key={idx} className="flex items-center gap-1.5 sm:gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-purple-500 flex-shrink-0"></div>
+                <li key={idx} className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 mt-2 flex-shrink-0"></div>
                   {item}
                 </li>
               ))}
@@ -944,18 +1160,75 @@ function Home() {
           animation: slideDown 0.3s ease-out forwards;
         }
         
-        /* Prevent text overflow on mobile */
-        @media (max-width: 640px) {
-          .truncate {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-          
-          .truncate:hover {
-            white-space: normal;
-            text-overflow: clip;
-          }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes gradient-border {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        .animate-gradient-border {
+          background-size: 200% 200%;
+          animation: gradient-border 2s ease infinite;
+        }
+        
+        @keyframes gridMove {
+          0% { background-position: 0 0; }
+          100% { background-position: 50px 50px; }
+        }
+        
+        @keyframes glitch {
+          0% { transform: translate(0); }
+          20% { transform: translate(-2px, 2px); }
+          40% { transform: translate(-2px, -2px); }
+          60% { transform: translate(2px, 2px); }
+          80% { transform: translate(2px, -2px); }
+          100% { transform: translate(0); }
+        }
+        .animate-glitch {
+          animation: glitch 0.3s linear;
+        }
+        
+        .animation-delay-500 {
+          animation-delay: 500ms;
+        }
+        
+        .animation-delay-1000 {
+          animation-delay: 1000ms;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+          width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.3);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+          background: linear-gradient(to bottom, #06b6d4, #8b5cf6, #ec4899);
+          border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(to bottom, #0891b2, #7c3aed, #db2777);
+        }
+        
+        /* Text selection */
+        ::selection {
+          background: rgba(6, 182, 212, 0.3);
+          color: white;
+        }
+        
+        /* Smooth transitions */
+        * {
+          transition: background-color 0.3s ease, border-color 0.3s ease;
         }
       `}</style>
     </div>
