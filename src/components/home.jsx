@@ -556,7 +556,7 @@ function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {[
                 {
-                  title: "QUANTUM CONVERTER",
+                  title: "CONVERTER",
                   desc: "Advanced currency conversion platform with real-time rates and predictive analytics",
                   img: "converter.png",
                   url: "converter-activity/index.html",
@@ -566,7 +566,7 @@ function Home() {
                 {
                   title: "CALCULATOR NEXUS",
                   desc: "Scientific calculator with advanced functions and responsive design",
-                  img: "calculator.png",
+                  img: "loop.png",
                   url: "Calculator/index.html",
                   tech: ["JS", "ALGORITHMS", "UI/UX"],
                   glow: "from-purple-500/20 to-pink-500/20"
@@ -574,13 +574,13 @@ function Home() {
                 {
                   title: "LOOP ANALYTICS",
                   desc: "Mathematical analysis tool for sequence processing and pattern recognition",
-                  img: "loop.png",
+                  img: "calculator.png",
                   url: "Loop/index.html",
                   tech: ["JS", "DATA", "VISUALIZATION"],
                   glow: "from-pink-500/20 to-rose-500/20"
                 },
                 {
-                  title: "TASK ORBIT",
+                  title: "TO DO LIST",
                   desc: "AI-powered task management system with intelligent scheduling",
                   imgs: ["todo.png", "list.png"],
                   url: "https://to-do-client-brown.vercel.app/",
