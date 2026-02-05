@@ -405,7 +405,7 @@ function Home() {
           
           {/* Tech Orbital */}
           <div className="flex flex-wrap justify-center gap-3 mb-12 max-w-3xl mx-auto px-4">
-            {["REACT ECOSYSTEM", "MODERN JS", "UI/UX", "WEBGL", "ANIMATIONS", "PERFORMANCE", "RESPONSIVE", "CLOUD"].map((tech, idx) => (
+            {["REACT ECOSYSTEM", "MODERN JS", "UI/UX", "ANIMATIONS", "PERFORMANCE", "RESPONSIVE"].map((tech, idx) => (
               <div
                 key={idx}
                 className="relative group"
