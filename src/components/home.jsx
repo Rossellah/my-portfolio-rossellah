@@ -683,34 +683,34 @@ function Home() {
           )}
         </section>
 
-        {/* Contact Section */}
+        {/* Contact Section - Fixed Responsive Issues */}
         <section id="contact" className="mb-16 px-4 sm:px-0">
-          <div className="bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-900/20 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-gray-800/50 shadow-2xl overflow-hidden">
+          <div className="bg-gradient-to-br from-gray-900/60 via-gray-900/40 to-gray-900/20 backdrop-blur-xl rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-800/50 shadow-2xl overflow-hidden">
             {/* Background Pattern */}
             <div className="absolute top-0 right-0 w-32 h-32 sm:w-64 sm:h-64 bg-gradient-to-br from-pink-500/10 via-purple-500/10 to-indigo-500/10 rounded-full blur-3xl -z-10"></div>
             
             <div className="relative z-10">
-              <div className="text-center mb-8 sm:mb-10">
-                <div className="inline-block px-6 py-2 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 rounded-full border border-pink-500/30 mb-4">
-                  <span className="text-sm font-medium text-pink-300">
+              <div className="text-center mb-6 sm:mb-8 lg:mb-10">
+                <div className="inline-block px-4 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 rounded-full border border-pink-500/30 mb-3 sm:mb-4">
+                  <span className="text-xs sm:text-sm font-medium text-pink-300">
                     Get In Touch
                   </span>
                 </div>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3">
                   Let's <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">Collaborate</span>
                 </h2>
-                <p className="text-gray-400 max-w-2xl mx-auto text-sm sm:text-base">
+                <p className="text-gray-400 max-w-2xl mx-auto text-xs sm:text-sm lg:text-base px-2">
                   Have a project in mind? I'd love to hear about it
                 </p>
               </div>
 
-              <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
-                {/* Contact Info */}
+              <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                {/* Contact Info - Fixed for mobile */}
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold text-white mb-6">
+                  <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white mb-4 sm:mb-6">
                     Connect With Me
                   </h3>
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {[
                       { icon: <FaEnvelope />, label: "Email", value: "dbodanorossellahmarie@gmail.com", color: "from-pink-500 to-rose-500" },
                       { icon: <FaPhoneAlt />, label: "Phone", value: "09603458372", color: "from-purple-500 to-indigo-500" },
@@ -718,51 +718,55 @@ function Home() {
                     ].map((info, idx) => (
                       <div
                         key={idx}
-                        className="group flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300 hover:scale-[1.02]"
+                        className="group flex items-start sm:items-center gap-2 sm:gap-3 lg:gap-4 p-2.5 sm:p-3 lg:p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300 hover:scale-[1.02]"
                       >
-                        <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br ${info.color} flex items-center justify-center flex-shrink-0`}>
-                          {info.icon}
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg bg-gradient-to-br ${info.color} flex items-center justify-center flex-shrink-0`}>
+                          <span className="text-sm sm:text-base lg:text-lg text-white">
+                            {info.icon}
+                          </span>
                         </div>
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0"> {/* Added min-w-0 to prevent overflow */}
                           <p className="text-xs sm:text-sm text-gray-400">
                             {info.label}
                           </p>
-                          <p className="text-white font-medium truncate text-sm sm:text-base">{info.value}</p>
+                          <p className="text-white font-medium text-sm sm:text-base lg:text-lg truncate hover:text-clip hover:whitespace-normal">
+                            {info.value}
+                          </p>
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  {/* Social Links */}
-                  <div className="mt-8">
-                    <h4 className="text-base sm:text-lg font-bold text-white mb-4">
+                  {/* Social Links - Fixed for mobile */}
+                  <div className="mt-6 sm:mt-8">
+                    <h4 className="text-sm sm:text-base lg:text-lg font-bold text-white mb-3 sm:mb-4">
                       Follow My Journey
                     </h4>
-                    <div className="flex gap-2 sm:gap-3">
+                    <div className="flex gap-1.5 sm:gap-2 lg:gap-3 flex-wrap">
                       {socialLinks.map((link, idx) => (
                         <a
                           key={idx}
                           href={link.href}
                           target="_blank"
                           rel="noreferrer"
-                          className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${link.color} border border-gray-700 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-gray-900/30`}
+                          className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl ${link.color} border border-gray-700 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-gray-900/30 flex-shrink-0`}
                           aria-label={link.label}
                         >
-                          <span className="text-white text-base sm:text-lg">{link.icon}</span>
+                          <span className="text-white text-sm sm:text-base lg:text-lg">{link.icon}</span>
                         </a>
                       ))}
                     </div>
                   </div>
                 </div>
 
-                {/* Contact Form */}
-                <div>
-                  <form className="space-y-4">
+                {/* Contact Form - Fixed for mobile */}
+                <div className="mt-4 sm:mt-0">
+                  <form className="space-y-3 sm:space-y-4">
                     <div className="relative">
                       <input
                         type="text"
                         placeholder="Your Name"
-                        className="w-full p-3 sm:p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all text-sm sm:text-base"
+                        className="w-full p-2.5 sm:p-3 lg:p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 text-white placeholder-gray-500 focus:outline-none focus:ring-1 sm:focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all text-sm sm:text-base"
                       />
                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-pink-500/50 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
                     </div>
@@ -770,22 +774,22 @@ function Home() {
                       <input
                         type="email"
                         placeholder="Your Email"
-                        className="w-full p-3 sm:p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all text-sm sm:text-base"
+                        className="w-full p-2.5 sm:p-3 lg:p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 text-white placeholder-gray-500 focus:outline-none focus:ring-1 sm:focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all text-sm sm:text-base"
                       />
                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <div className="relative">
                       <textarea
                         placeholder="Your Message"
-                        rows="4"
-                        className="w-full p-3 sm:p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all resize-none text-sm sm:text-base"
+                        rows="3"
+                        className="w-full p-2.5 sm:p-3 lg:p-4 rounded-xl bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 text-white placeholder-gray-500 focus:outline-none focus:ring-1 sm:focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all resize-none text-sm sm:text-base"
                       ></textarea>
                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <button
                       type="button"
                       onClick={() => window.location.href = 'mailto:dbodanorossellahmarie@gmail.com'}
-                      className="w-full py-3 sm:py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-2 text-sm sm:text-base"
+                      className="w-full py-2.5 sm:py-3 lg:py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-xl sm:hover:shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-2 text-sm sm:text-base"
                     >
                       Send Message
                     </button>
@@ -798,18 +802,18 @@ function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800/30 bg-gray-900/20 backdrop-blur-xl py-6 sm:py-8">
+      <footer className="border-t border-gray-800/30 bg-gray-900/20 backdrop-blur-xl py-4 sm:py-6 lg:py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="inline-block mb-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 flex items-center justify-center">
-                <FaCode className="text-pink-400 text-sm sm:text-base" />
+            <div className="inline-block mb-3 sm:mb-4">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 flex items-center justify-center">
+                <FaCode className="text-pink-400 text-xs sm:text-sm lg:text-base" />
               </div>
             </div>
             <p className="text-gray-500 text-xs sm:text-sm">
               © {new Date().getFullYear()} Rossellah Marie Bodaño
             </p>
-            <p className="text-gray-600 text-xs mt-2">
+            <p className="text-gray-600 text-xs mt-1 sm:mt-2">
               Crafted with creativity and precision
             </p>
           </div>
@@ -822,22 +826,22 @@ function Home() {
         onClose={profileDialog.close}
         title="Profile Overview"
       >
-        <div className="flex flex-col items-center gap-4 sm:gap-6">
+        <div className="flex flex-col items-center gap-3 sm:gap-4 lg:gap-6">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-full animate-spin-slow opacity-20 blur-xl"></div>
             <img
               src={profileImageUrl}
               alt="Rossellah Marie Bodaño"
-              className="relative w-32 h-32 sm:w-48 sm:h-48 rounded-full border-4 border-gray-900 shadow-2xl object-cover"
+              className="relative w-24 h-24 sm:w-32 sm:h-32 lg:w-48 lg:h-48 rounded-full border-4 border-gray-900 shadow-2xl object-cover"
               onError={handleImageError}
             />
           </div>
           <div className="text-center">
-            <h3 className="text-xl sm:text-2xl font-bold text-white">
+            <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
               Rossellah Marie Bodaño
             </h3>
-            <p className="text-transparent bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text font-medium text-sm sm:text-base">Frontend Developer & UI/UX Specialist</p>
-            <p className="text-gray-300 mt-3 text-sm sm:text-base">
+            <p className="text-transparent bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text font-medium text-xs sm:text-sm lg:text-base">Frontend Developer & UI/UX Specialist</p>
+            <p className="text-gray-300 mt-2 sm:mt-3 text-xs sm:text-sm lg:text-base">
               Information Technology Student
             </p>
           </div>
@@ -851,28 +855,23 @@ function Home() {
         title="Certificate Preview"
       >
         {selectedCert && (
-          <div className="flex flex-col items-center gap-4 sm:gap-6">
+          <div className="flex flex-col items-center gap-3 sm:gap-4 lg:gap-6">
             <div className="relative">
               <img
                 src={selectedCert}
                 alt="Certificate"
-                className="w-full max-h-[50vh] sm:max-h-[60vh] object-contain rounded-lg border border-gray-700"
+                className="w-full max-h-[40vh] sm:max-h-[50vh] lg:max-h-[60vh] object-contain rounded-lg border border-gray-700"
                 onError={handleCertError}
               />
             </div>
-            <div className="flex gap-3 flex-wrap justify-center">
+            <div className="flex gap-2 sm:gap-3 flex-wrap justify-center">
               <button
                 onClick={() => handleCertificateDownload(selectedCert)}
-                className="px-5 py-2.5 sm:px-6 sm:py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-indigo-500/25 transition-all duration-300 flex items-center gap-2 text-sm sm:text-base hover:scale-105 active:scale-95"
+                className="px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-indigo-500/25 transition-all duration-300 flex items-center gap-2 text-xs sm:text-sm lg:text-base hover:scale-105 active:scale-95"
               >
-                <FaDownload /> Download Certificate
+                <FaDownload className="text-xs sm:text-sm" /> Download Certificate
               </button>
-              {/* Removed the Close button */}
             </div>
-            {/* Click outside to close instruction */}
-            <p className="text-gray-400 text-xs sm:text-sm mt-2 text-center">
-              
-            </p>
           </div>
         )}
       </Dialog>
@@ -883,18 +882,18 @@ function Home() {
         onClose={aboutDialog.close}
         title="Creative Journey"
       >
-        <div className="space-y-4">
-          <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+        <div className="space-y-3 sm:space-y-4">
+          <p className="text-gray-300 leading-relaxed text-xs sm:text-sm lg:text-base">
             As a passionate Information Technology student from Gaddani, Tayum, Abra, I merge academic excellence with creative web development. My approach focuses on crafting digital experiences that are both visually stunning and functionally robust.
           </p>
-          <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+          <p className="text-gray-300 leading-relaxed text-xs sm:text-sm lg:text-base">
             Specializing in modern web technologies, I transform ideas into responsive, intuitive applications. With expertise in front-end development and expanding into full-stack capabilities, I deliver solutions that prioritize user experience and technical excellence.
           </p>
-          <div className="pt-4 border-t border-gray-800">
-            <h4 className="text-white font-medium mb-2 text-base sm:text-lg">
+          <div className="pt-3 sm:pt-4 border-t border-gray-800">
+            <h4 className="text-white font-medium mb-1.5 sm:mb-2 text-sm sm:text-base lg:text-lg">
               Creative Philosophy:
             </h4>
-            <ul className="text-gray-300 space-y-2 text-sm sm:text-base">
+            <ul className="text-gray-300 space-y-1.5 sm:space-y-2 text-xs sm:text-sm lg:text-base">
               {[
                 "Pixel-perfect UI/UX implementation",
                 "Responsive, mobile-first design approach",
@@ -902,7 +901,8 @@ function Home() {
                 "Clean, maintainable code architecture",
                 "Continuous learning and innovation"
               ].map((item, idx) => (
-                <li key={idx} className="flex items-center gap-2">
+                <li key={idx} className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-purple-500 flex-shrink-0"></div>
                   {item}
                 </li>
               ))}
@@ -942,6 +942,20 @@ function Home() {
         }
         .animate-slideDown {
           animation: slideDown 0.3s ease-out forwards;
+        }
+        
+        /* Prevent text overflow on mobile */
+        @media (max-width: 640px) {
+          .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          
+          .truncate:hover {
+            white-space: normal;
+            text-overflow: clip;
+          }
         }
       `}</style>
     </div>
