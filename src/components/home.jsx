@@ -712,7 +712,7 @@ function Home() {
             >
               <FaCertificate className="text-xs sm:text-sm" />
               <span className="hidden sm:inline">CERTIFICATIONS</span>
-              <span className="sm:hidden">CERTS</span>
+              <span className="sm:hidden">CISCO</span>
             </button>
             <button
               onClick={() => setCertTab("webinars")}
