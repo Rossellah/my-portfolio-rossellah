@@ -724,7 +724,7 @@ function Home() {
             >
               <FaComments className="text-xs sm:text-sm" />
               <span className="hidden sm:inline">WEBINARS</span>
-              <span className="sm:hidden">WEB</span>
+              <span className="sm:hidden">WEBINARS</span>
             </button>
           </div>
 
