@@ -343,17 +343,17 @@ function Home() {
               <div className="absolute inset-[-30px] border-4 border-transparent border-t-purple-500 border-r-pink-500 border-b-cyan-500 border-l-purple-500 rounded-full animate-spin-slow animation-delay-1000"></div>
             </div>
             
-            {/* Image Container */}
+            {/* Image Container - ORIGINAL COLORS */}
             <div className="relative rounded-full p-2 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 animate-gradient-border">
               <div className="relative rounded-full overflow-hidden border-4 border-black/50 w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 group-hover:scale-110 transition-transform duration-700">
                 <img
                   src={profileImageUrl}
                   alt="Rossellah Marie Bodaño"
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                  className="w-full h-full object-cover"
                   onError={handleImageError}
                 />
                 {/* Holographic Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-cyan-500/20 via-transparent to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-cyan-500/10 via-transparent to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
             </div>
 
@@ -498,36 +498,36 @@ function Home() {
               </div>
               
               <div className="relative">
-  <h3 className="font-bold text-2xl sm:text-3xl text-white mb-8 tracking-wider">
-    <FaBolt className="inline mr-3 text-cyan-400" />
-    SKILLS
-  </h3>
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    {skills.map((skill, idx) => (
-      <div key={idx} className="group relative">
-        <div className={`p-4 rounded-2xl bg-gradient-to-br ${skill.color} border border-white/10 hover:border-white/30 transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-xl group-hover:shadow-purple-500/20`}>
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <span className="text-xl sm:text-2xl text-white">{skill.icon}</span>
-              <span className="font-bold text-white text-sm sm:text-base tracking-wide">{skill.name}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-xs sm:text-sm font-bold text-white/90">{skill.level}%</span>
-            </div>
-          </div>
-          <div className="h-2 bg-black/30 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-white to-white/80 rounded-full transition-all duration-1000"
-              style={{ width: `${skill.level}%` }}
-            ></div>
-          </div>
-          {/* Glow effect on hover */}
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-purple-500/0 to-pink-500/0 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
+                <h3 className="font-bold text-2xl sm:text-3xl text-white mb-8 tracking-wider">
+                  <FaBolt className="inline mr-3 text-cyan-400" />
+                  SKILLS
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {skills.map((skill, idx) => (
+                    <div key={idx} className="group relative">
+                      <div className={`p-4 rounded-2xl bg-gradient-to-br ${skill.color} border border-white/10 hover:border-white/30 transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-xl group-hover:shadow-purple-500/20`}>
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <span className="text-xl sm:text-2xl text-white">{skill.icon}</span>
+                            <span className="font-bold text-white text-sm sm:text-base tracking-wide">{skill.name}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs sm:text-sm font-bold text-white/90">{skill.level}%</span>
+                          </div>
+                        </div>
+                        <div className="h-2 bg-black/30 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-white to-white/80 rounded-full transition-all duration-1000"
+                            style={{ width: `${skill.level}%` }}
+                          ></div>
+                        </div>
+                        {/* Glow effect on hover */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-purple-500/0 to-pink-500/0 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
