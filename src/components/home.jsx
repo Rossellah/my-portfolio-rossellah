@@ -732,7 +732,12 @@ function Home() {
           {certTab === "certificates" && (
             <div className="max-w-7xl mx-auto px-2 sm:px-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-                {[
+                {[ {
+    name: "DATA ANALYTICS ESSENTIALS",
+    subtitle: "Learn the essential tools of the trade.",
+    file: "DATAAL.png",
+    color: "from-orange-500/20 to-yellow-500/20"
+  },
                   {
                     name: "AI FUNDAMENTALS",
                     subtitle: "IBM SkillsBuild",
@@ -764,11 +769,12 @@ function Home() {
                     color: "from-green-500/20 to-emerald-500/20"
                   },
                   {
-                    name: "AI ENGINEER",
+                    name: "MODERN AI",
                     subtitle: "Machine Learning",
                     file: "aii.png",
                     color: "from-orange-500/20 to-red-500/20"
                   }
+                  
                 ].map((cert, index) => (
                   <div
                     key={index}
@@ -818,12 +824,19 @@ function Home() {
             <div className="max-w-7xl mx-auto px-2 sm:px-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
                 {[
+                   {
+                    name: "Data Privacy, Freedom of Information, and AI Safety",
+                    subtitle: "Certificate of Attendance",
+                    file: "CER.png",
+                    color: "from-cyan-500/20 to-blue-500/20"
+                  },
                   {
                     name: "CYBER SECURITY",
                     subtitle: "Digital Safety Protocol",
                     file: "lheng-digital-safety.jpg",
                     color: "from-cyan-500/20 to-blue-500/20"
-                  }
+                  },
+                  
                 ].map((webinar, index) => (
                   <div
                     key={index}
