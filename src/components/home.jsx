@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   FaGithub,
   FaLinkedin,
@@ -33,10 +33,23 @@ import {
   FaMagic,
   FaBolt,
   FaFire,
-  FaMeteor
+  FaMeteor,
+  FaFileAlt,
+  FaIdCard,
+  FaQrcode,
+  FaShieldAlt,
+  FaMicrochip,
+  FaFilePdf,
+  FaFileImage,
+  FaSchool,
+  FaGraduationCap,
+  FaUserGraduate,
+  FaLink,
+  FaCube // added for 3D effect
 } from "react-icons/fa";
 import { SiTailwindcss, SiTypescript, SiNextdotjs, SiVercel, SiNetlify } from "react-icons/si";
 import { Dialog, useDialog } from "./Dialog";
+import { motion, useMotionValue, useTransform, useSpring, useDragControls } from "framer-motion";
 
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -49,8 +62,30 @@ function Home() {
   const certificateDialog = useDialog();
   const [certTab, setCertTab] = useState("certificates");
   const aboutDialog = useDialog();
+  const resumeDialog = useDialog();
   const [glitchEffect, setGlitchEffect] = useState(false);
   const [isHoveringHero, setIsHoveringHero] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  
+  // Refs for ID card physics
+  const cardRef = useRef(null);
+  const controls = useDragControls();
+  const constraintsRef = useRef(null);
+
+  // Motion values for realistic 3D physics
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const rotateZ = useMotionValue(0);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  
+  // Spring configurations for natural 3D movement
+  const springConfig = { stiffness: 150, damping: 20, mass: 1.2 };
+  const springRotateX = useSpring(rotateX, springConfig);
+  const springRotateY = useSpring(rotateY, springConfig);
+  const springRotateZ = useSpring(rotateZ, springConfig);
+  const springX = useSpring(x, { stiffness: 200, damping: 25, mass: 0.8 });
+  const springY = useSpring(y, { stiffness: 200, damping: 25, mass: 0.8 });
 
   // Handle scroll effect for navbar
   useEffect(() => {
@@ -61,14 +96,23 @@ function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Mouse move effect for interactive background
+  // Gentle 3D swaying animation when not interacting
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+    let interval;
+    if (!isDragging) {
+      interval = setInterval(() => {
+        const time = Date.now() * 0.001;
+        const swayX = Math.sin(time) * 1.5;
+        const swayY = Math.cos(time * 1.2) * 1;
+        const swayZ = Math.sin(time * 0.7) * 1;
+        
+        rotateX.set(swayY);
+        rotateY.set(swayX);
+        rotateZ.set(swayZ);
+      }, 50);
+    }
+    return () => clearInterval(interval);
+  }, [isDragging]);
 
   // Create floating particles
   useEffect(() => {
@@ -128,6 +172,10 @@ function Home() {
     e.target.src = `https://via.placeholder.com/800x600/0a0a0a/339af0?text=Project+Showcase`;
   };
 
+  const handleResumeError = (e) => {
+    e.target.src = `https://via.placeholder.com/800x1000/0a0a0a/cyan?text=Resume+Image`;
+  };
+
   // Function to handle certificate download
   const handleCertificateDownload = (certificateUrl) => {
     if (!certificateUrl) return;
@@ -142,12 +190,83 @@ function Home() {
     certificateDialog.close();
   };
 
+  // Function to handle resume PDF download
+  const handleResumePDFDownload = () => {
+    const resumeUrl = "/Rossellah_Marie_Bodano_Resume.pdf";
+    const link = document.createElement('a');
+    link.href = resumeUrl;
+    link.download = "Rossellah_Marie_Bodano_Resume.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Function to handle resume image download
+  const handleResumeImageDownload = () => {
+    const resumeImageUrl = "/resume-image.png";
+    const link = document.createElement('a');
+    link.href = resumeImageUrl;
+    link.download = "Rossellah_Marie_Bodano_Resume.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Handle drag start
+  const handleDragStart = () => {
+    setIsDragging(true);
+    rotateX.set(0);
+    rotateY.set(0);
+    rotateZ.set(0);
+  };
+
+  // Handle drag with realistic 3D physics
+  const handleDrag = (event, info) => {
+    // Position follows drag with damping (like a spring)
+    x.set(info.offset.x * 0.4);
+    y.set(info.offset.y * 0.4);
+    
+    // Rotation based on drag velocity and offset (gives a spinning effect)
+    const rotationY = info.offset.x * 0.04;
+    const rotationX = info.offset.y * -0.04;
+    const rotationZ = info.offset.x * 0.02;
+    
+    rotateY.set(rotationY);
+    rotateX.set(rotationX);
+    rotateZ.set(rotationZ);
+  };
+
+  // Handle drag end - spring back to center with a little spin
+  const handleDragEnd = (event, info) => {
+    setIsDragging(false);
+    
+    // Return position to center
+    x.set(0);
+    y.set(0);
+    
+    // Add a little spin based on release velocity
+    const spinY = info.velocity.x * 0.01;
+    const spinX = info.velocity.y * -0.01;
+    const spinZ = info.velocity.x * 0.005;
+    
+    rotateY.set(spinY);
+    rotateX.set(spinX);
+    rotateZ.set(spinZ);
+    
+    // Gradually return to neutral sway
+    setTimeout(() => {
+      rotateY.set(0);
+      rotateX.set(0);
+      rotateZ.set(0);
+    }, 200);
+  };
+
   const navItems = [
     { label: "HOME", section: "home", icon: <FaRocket /> },
     { label: "ABOUT", section: "about", icon: <FaUser /> },
-    { label: "SKILLS", section: "skills", icon: <FaBolt /> },
     { label: "PROJECTS", section: "projects", icon: <FaCode /> },
     { label: "CERTIFICATES", section: "certificates", icon: <FaCertificate /> },
+    { label: "RESUME", section: "resume", icon: <FaFileAlt />, action: "dialog" },
     { label: "CONTACT", section: "contact", icon: <FaComments /> },
   ];
 
@@ -178,16 +297,14 @@ function Home() {
 
   return (
     <div id="home" className="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-950 text-gray-100 font-sans overflow-x-hidden relative">
-      {/* Cosmic Background */}
+      {/* Cosmic Background (unchanged) */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {/* Nebula Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-pink-900/20"></div>
           <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-cyan-500/10 via-transparent to-transparent"></div>
           <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-pink-500/10 via-transparent to-transparent"></div>
         </div>
 
-        {/* Animated Particles */}
         {particles.map(p => (
           <div
             key={p.id}
@@ -202,7 +319,6 @@ function Home() {
           />
         ))}
 
-        {/* Interactive Light */}
         <div 
           className="absolute inset-0 opacity-30 pointer-events-none transition-all duration-300"
           style={{
@@ -210,7 +326,6 @@ function Home() {
           }}
         ></div>
 
-        {/* Grid Pattern with Animation */}
         <div className="absolute inset-0 opacity-10">
           <div 
             className="absolute inset-0"
@@ -223,18 +338,16 @@ function Home() {
           ></div>
         </div>
 
-        {/* Light Beams */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-cyan-500/5 via-transparent to-pink-500/5 rounded-full blur-3xl animate-spin-slow"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/5 via-transparent to-blue-500/5 rounded-full blur-3xl animate-spin-slow animation-delay-1000"></div>
       </div>
 
-      {/* Navigation Bar - Futuristic Design */}
+      {/* Navigation Bar (unchanged) */}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
         scrolled ? "bg-black/90 backdrop-blur-2xl py-3 border-b border-cyan-500/20 shadow-2xl shadow-cyan-500/10" : "bg-transparent py-4 sm:py-6"
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
-            {/* Logo with Glitch Effect */}
             <div className="group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <div className="relative">
                 <div className={`absolute inset-0 bg-gradient-to-r from-cyan-500 to-pink-500 blur-xl opacity-30 transition-opacity duration-500 group-hover:opacity-60 ${glitchEffect ? 'animate-pulse' : ''}`}></div>
@@ -247,38 +360,58 @@ function Home() {
               </div>
             </div>
 
-            {/* Desktop Navigation - Futuristic */}
             <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
               {navItems.map((item) => (
-                <a
-                  key={item.section}
-                  href={`#${item.section}`}
-                  onClick={() => setActive(item.section)}
-                  className={`relative px-4 lg:px-5 py-2 lg:py-2.5 font-mono text-xs lg:text-sm tracking-widest transition-all duration-500 group overflow-hidden ${
-                    active === item.section 
-                      ? "text-white" 
-                      : "text-gray-400 hover:text-cyan-300"
-                  }`}
-                >
-                  <span className="flex items-center gap-1 lg:gap-2">
-                    <span className="text-cyan-400/50 group-hover:text-cyan-300 transition-colors text-sm">
-                      {item.icon}
+                item.action === "dialog" ? (
+                  <button
+                    key={item.section}
+                    onClick={() => {
+                      setActive(item.section);
+                      resumeDialog.open();
+                    }}
+                    className={`relative px-4 lg:px-5 py-2 lg:py-2.5 font-mono text-xs lg:text-sm tracking-widest transition-all duration-500 group overflow-hidden ${
+                      active === item.section ? "text-white" : "text-gray-400 hover:text-cyan-300"
+                    }`}
+                  >
+                    <span className="flex items-center gap-1 lg:gap-2">
+                      <span className="text-cyan-400/50 group-hover:text-cyan-300 transition-colors text-sm">{item.icon}</span>
+                      <span className="hidden lg:inline">{item.label}</span>
+                      <span className="lg:hidden text-xs">{item.label.substring(0, 3)}</span>
                     </span>
-                    <span className="hidden lg:inline">{item.label}</span>
-                    <span className="lg:hidden text-xs">{item.label.substring(0, 3)}</span>
-                  </span>
-                  {active === item.section && (
-                    <>
-                      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"></div>
-                      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 blur-sm"></div>
-                    </>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -skew-x-12"></div>
-                </a>
+                    {active === item.section && (
+                      <>
+                        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"></div>
+                        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 blur-sm"></div>
+                      </>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -skew-x-12"></div>
+                  </button>
+                ) : (
+                  <a
+                    key={item.section}
+                    href={`#${item.section}`}
+                    onClick={() => setActive(item.section)}
+                    className={`relative px-4 lg:px-5 py-2 lg:py-2.5 font-mono text-xs lg:text-sm tracking-widest transition-all duration-500 group overflow-hidden ${
+                      active === item.section ? "text-white" : "text-gray-400 hover:text-cyan-300"
+                    }`}
+                  >
+                    <span className="flex items-center gap-1 lg:gap-2">
+                      <span className="text-cyan-400/50 group-hover:text-cyan-300 transition-colors text-sm">{item.icon}</span>
+                      <span className="hidden lg:inline">{item.label}</span>
+                      <span className="lg:hidden text-xs">{item.label.substring(0, 3)}</span>
+                    </span>
+                    {active === item.section && (
+                      <>
+                        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"></div>
+                        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 blur-sm"></div>
+                      </>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -skew-x-12"></div>
+                  </a>
+                )
               ))}
             </div>
 
-            {/* Mobile Menu Button - Futuristic */}
             <button
               className="md:hidden text-gray-300 hover:text-cyan-300 p-2 relative group"
               onClick={() => setMenuOpen(!menuOpen)}
@@ -293,27 +426,45 @@ function Home() {
             </button>
           </div>
 
-          {/* Mobile Navigation - Futuristic */}
           {menuOpen && (
             <div className="md:hidden mt-4 bg-black/90 backdrop-blur-2xl rounded-2xl border border-cyan-500/20 shadow-2xl shadow-cyan-500/10 animate-slideDown overflow-hidden">
               <div className="p-2 space-y-1">
                 {navItems.map((item) => (
-                  <a
-                    key={item.section}
-                    href={`#${item.section}`}
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setActive(item.section);
-                    }}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg font-mono text-sm tracking-wider transition-all duration-300 ${
-                      active === item.section
-                        ? "bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 text-white border border-cyan-500/30"
-                        : "text-gray-300 hover:text-white hover:bg-gray-900/50 border border-transparent hover:border-cyan-500/20"
-                    }`}
-                  >
-                    <span className="text-cyan-400">{item.icon}</span>
-                    <span>{item.label}</span>
-                  </a>
+                  item.action === "dialog" ? (
+                    <button
+                      key={item.section}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setActive(item.section);
+                        resumeDialog.open();
+                      }}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg font-mono text-sm tracking-wider transition-all duration-300 w-full ${
+                        active === item.section
+                          ? "bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 text-white border border-cyan-500/30"
+                          : "text-gray-300 hover:text-white hover:bg-gray-900/50 border border-transparent hover:border-cyan-500/20"
+                      }`}
+                    >
+                      <span className="text-cyan-400">{item.icon}</span>
+                      <span>{item.label}</span>
+                    </button>
+                  ) : (
+                    <a
+                      key={item.section}
+                      href={`#${item.section}`}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setActive(item.section);
+                      }}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg font-mono text-sm tracking-wider transition-all duration-300 ${
+                        active === item.section
+                          ? "bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 text-white border border-cyan-500/30"
+                          : "text-gray-300 hover:text-white hover:bg-gray-900/50 border border-transparent hover:border-cyan-500/20"
+                      }`}
+                    >
+                      <span className="text-cyan-400">{item.icon}</span>
+                      <span>{item.label}</span>
+                    </a>
+                  )
                 ))}
               </div>
             </div>
@@ -323,28 +474,24 @@ function Home() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20 relative z-10">
-        {/* Hero Section - Futuristic */}
+        {/* Hero Section (unchanged) */}
         <header 
           className="text-center mb-20 sm:mb-32 relative"
           onMouseEnter={() => setIsHoveringHero(true)}
           onMouseLeave={() => setIsHoveringHero(false)}
         >
-          {/* Holographic Effect */}
           <div className={`absolute inset-0 -z-10 transition-all duration-1000 ${
             isHoveringHero ? 'opacity-30' : 'opacity-10'
           }`}>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] md:w-[800px] md:h-[800px] bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-full blur-3xl animate-pulse"></div>
           </div>
 
-          {/* Profile Image with Holographic Effect */}
           <div className="relative inline-block mb-8 sm:mb-12 group cursor-pointer" onClick={profileDialog.open}>
-            {/* Outer Rings */}
             <div className="absolute inset-0 animate-spin-slow">
               <div className="absolute inset-[-15px] sm:inset-[-20px] border-4 border-transparent border-t-cyan-500 border-r-purple-500 border-b-pink-500 border-l-cyan-500 rounded-full"></div>
               <div className="absolute inset-[-25px] sm:inset-[-30px] border-4 border-transparent border-t-purple-500 border-r-pink-500 border-b-cyan-500 border-l-purple-500 rounded-full animate-spin-slow animation-delay-1000"></div>
             </div>
             
-            {/* Image Container - ORIGINAL COLORS */}
             <div className="relative rounded-full p-1.5 sm:p-2 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 animate-gradient-border">
               <div className="relative rounded-full overflow-hidden border-4 border-black/50 w-32 h-32 sm:w-40 sm:h-40 md:w-52 md:h-52 lg:w-64 lg:h-64 group-hover:scale-110 transition-transform duration-700">
                 <img
@@ -353,12 +500,10 @@ function Home() {
                   className="w-full h-full object-cover"
                   onError={handleImageError}
                 />
-                {/* Holographic Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-cyan-500/10 via-transparent to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
             </div>
 
-            {/* Floating Elements */}
             <div className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 flex items-center justify-center animate-float">
               <FaStar className="text-white text-xs sm:text-sm" />
             </div>
@@ -367,7 +512,6 @@ function Home() {
             </div>
           </div>
           
-          {/* Name with Glitch Effect */}
           <div className="mb-6 sm:mb-8 px-2 sm:px-4 relative">
             <div className="inline-block px-4 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-full border border-cyan-500/30 mb-4 sm:mb-6 backdrop-blur-sm">
               <span className="text-xs sm:text-sm font-mono tracking-widest text-cyan-300">
@@ -388,7 +532,6 @@ function Home() {
             </div>
           </div>
           
-          {/* Dynamic Tagline */}
           <div className="relative inline-block mb-6 sm:mb-10 px-2 sm:px-4">
             <div className="relative px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-black/40 via-gray-900/40 to-black/40 backdrop-blur-xl rounded-xl sm:rounded-2xl border border-cyan-500/20 shadow-xl sm:shadow-2xl shadow-cyan-500/10 overflow-hidden max-w-2xl mx-auto">
               <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-300 font-medium">
@@ -397,19 +540,14 @@ function Home() {
                 <span className="text-purple-300">digital experiences</span> that{" "}
                 <span className="text-pink-300">inspire</span>
               </p>
-              {/* Animated Border */}
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
               <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
             </div>
           </div>
           
-          {/* Tech Orbital */}
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 max-w-3xl mx-auto px-2 sm:px-4">
             {["REACT ECOSYSTEM", "MODERN JS", "UI/UX", "PERFORMANCE", "RESPONSIVE"].map((tech, idx) => (
-              <div
-                key={idx}
-                className="relative group"
-              >
+              <div key={idx} className="relative group">
                 <span className="relative px-3 sm:px-4 py-1.5 sm:py-2.5 bg-gradient-to-r from-gray-900/80 to-black/80 backdrop-blur-sm text-gray-300 rounded-full text-xs font-mono tracking-wider border border-cyan-500/30 hover:border-purple-500/50 transition-all duration-300 cursor-pointer overflow-hidden">
                   <span className="hidden sm:inline">{tech}</span>
                   <span className="sm:hidden">{tech.split(" ")[0]}</span>
@@ -419,7 +557,6 @@ function Home() {
             ))}
           </div>
           
-          {/* CTA Buttons - Futuristic */}
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 lg:gap-5 px-2 sm:px-4">
             <a 
               href="#projects" 
@@ -427,7 +564,7 @@ function Home() {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-cyan-500/20 group-hover:via-purple-500/20 group-hover:to-pink-500/20 transition-all duration-500"></div>
               <FaRocket className="text-sm sm:text-lg animate-bounce group-hover:animate-spin" />
-              <span>EXPLORE UNIVERSE</span>
+              <span>EXPLORE PROJECTS</span>
             </a>
             <button 
               onClick={aboutDialog.open}
@@ -440,19 +577,17 @@ function Home() {
           </div>
         </header>
 
-        {/* About Section - Futuristic */}
+        {/* About Section - with 3D Interactive ID Card */}
         <section
           id="about"
           className="mb-20 sm:mb-32 relative group scroll-mt-20"
         >
-          {/* Section Background */}
           <div className="absolute inset-0 -z-10">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"></div>
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 blur-sm"></div>
           </div>
 
           <div className="bg-gradient-to-br from-gray-900/40 via-black/40 to-gray-900/40 backdrop-blur-2xl rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 border border-cyan-500/20 shadow-xl sm:shadow-2xl shadow-cyan-500/10 relative overflow-hidden">
-            {/* Animated Background Elements */}
             <div className="absolute top-0 right-0 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-gradient-to-br from-cyan-500/5 via-transparent to-pink-500/5 rounded-full blur-3xl"></div>
             <div className="absolute bottom-0 left-0 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-gradient-to-tr from-purple-500/5 via-transparent to-cyan-500/5 rounded-full blur-3xl"></div>
 
@@ -468,7 +603,7 @@ function Home() {
                 <span className="text-gray-300">JOURNEY</span>
               </h2>
             </div>
-            
+
             <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
               <div className="space-y-4 sm:space-y-6">
                 <p className="text-gray-300 leading-relaxed text-sm sm:text-base md:text-lg">
@@ -477,7 +612,115 @@ function Home() {
                 <p className="text-gray-300 leading-relaxed text-xs sm:text-sm md:text-base lg:text-lg">
                   With expertise in the modern web stack, I transform <span className="text-cyan-300">abstract concepts</span> into <span className="text-purple-300">tangible digital realities</span>. Continuously pushing boundaries towards full-stack excellence while maintaining <span className="text-pink-300">flawless execution</span>.
                 </p>
-                {/* Stats - Futuristic */}
+
+                {/* ===== 3D INTERACTIVE ID CARD ===== */}
+                <div className="relative mt-8 sm:mt-10 flex flex-col items-center perspective-1000">
+                  {/* 3D Card Container with enhanced depth */}
+                  <motion.div
+                    ref={cardRef}
+                    drag
+                    dragConstraints={{ left: -100, right: 100, top: -50, bottom: 50 }}
+                    dragElastic={0.1}
+                    dragMomentum={false}
+                    onDragStart={handleDragStart}
+                    onDrag={handleDrag}
+                    onDragEnd={handleDragEnd}
+                    style={{
+                      rotateX: springRotateX,
+                      rotateY: springRotateY,
+                      rotateZ: springRotateZ,
+                      x: springX,
+                      y: springY,
+                      cursor: isDragging ? 'grabbing' : 'grab',
+                      transformPerspective: 1200, // Adds depth perception
+                    }}
+                    className="relative z-30 w-64 sm:w-72 cursor-grab active:cursor-grabbing"
+                  >
+                    {/* 3D Card with thickness effect */}
+                    <div className="relative transform-gpu" style={{ transformStyle: 'preserve-3d' }}>
+                      {/* Front face (main card) */}
+                      <div className="bg-gradient-to-br from-white via-gray-100 to-gray-200 rounded-2xl border-4 border-cyan-500/30 shadow-2xl overflow-hidden relative"
+                           style={{ transform: 'translateZ(2px)' }} // Slight forward offset for depth
+                      >
+                        {/* School Header */}
+                        <div className="bg-gradient-to-r from-cyan-600 to-purple-600 p-3 text-center">
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <FaSchool className="text-white text-lg" />
+                            <h3 className="text-white font-bold text-sm sm:text-base tracking-wider">UNIVERSITY OF ABRA</h3>
+                          </div>
+                          <div className="w-12 h-0.5 bg-white/50 mx-auto"></div>
+                        </div>
+                        
+                        {/* Photo Section */}
+                        <div className="p-4 flex flex-col items-center">
+                          <div className="relative mb-3">
+                            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-xl overflow-hidden border-4 border-cyan-500/50 shadow-lg">
+                              <img
+                                src={profileImageUrl}
+                                alt="Student ID Photo"
+                                className="w-full h-full object-cover"
+                                onError={handleImageError}
+                              />
+                            </div>
+                            {/* Holographic Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-cyan-500/10 via-transparent to-purple-500/10 rounded-xl pointer-events-none"></div>
+                            
+                            {/* Student Status Badge */}
+                            <div className="absolute -bottom-2 -right-2 bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-lg border border-white">
+                              ACTIVE
+                            </div>
+                          </div>
+
+                          {/* Student Info - Only Name */}
+                          <div className="text-center w-full">
+                            <div className="mb-2">
+                              <p className="text-[10px] text-gray-500 font-mono tracking-wider">STUDENT NAME</p>
+                              <h4 className="text-base sm:text-lg font-bold text-gray-800 break-words">
+                                ROSSELLAH MARIE BODAÑO
+                              </h4>
+                            </div>
+                            
+                            {/* School Info */}
+                            <div className="flex justify-center items-center gap-2 mt-2 text-[10px] text-gray-600">
+                              <FaGraduationCap className="text-cyan-600" />
+                              <span>BS Information Technology</span>
+                            </div>
+                          </div>
+
+                          {/* ID Number (subtle) */}
+                          <div className="mt-3 w-full border-t border-dashed border-gray-300 pt-2 flex justify-between items-center text-[8px] text-gray-400 font-mono">
+                            <span>ID: 22231-48435-4037</span>
+                            <span>•</span>
+                            <span>VALID 2026</span>
+                          </div>
+                        </div>
+
+                        {/* Card Footer with Holographic Stripe */}
+                        <div className="bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 h-1 w-full"></div>
+                        <div className="bg-gray-800 py-1 px-3 flex justify-between items-center text-[6px] text-white/50 font-mono">
+                          <span>DIGITAL ID</span>
+                          <span>• STUDENT •</span>
+                          <span>UNIVERSITY</span>
+                        </div>
+                      </div>
+
+                      {/* Edge / Side faces for 3D thickness (optional, can be subtle) */}
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-400/20 to-purple-400/20"
+                           style={{ transform: 'translateZ(-2px)', filter: 'blur(1px)' }} />
+                    </div>
+                  </motion.div>
+
+                  {/* Interactive Hint */}
+                  <motion.p 
+                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="text-[10px] text-cyan-400 mt-6 font-mono tracking-wider"
+                  >
+                    ↺ drag & spin - it's 3D!
+                  </motion.p>
+                </div>
+
+                {/* Stats (unchanged) */}
                 <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 sm:pt-8">
                   {[
                     { label: "PROJECTS", value: "15+", color: "from-cyan-500 to-blue-500", icon: <FaCode /> },
@@ -497,7 +740,7 @@ function Home() {
                   ))}
                 </div>
               </div>
-              
+
               <div className="relative mt-6 lg:mt-0">
                 <h3 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl text-white mb-4 sm:mb-6 md:mb-8 tracking-wider">
                   <FaBolt className="inline mr-2 sm:mr-3 text-cyan-400 text-sm sm:text-base" />
@@ -522,7 +765,6 @@ function Home() {
                             style={{ width: `${skill.level}%` }}
                           ></div>
                         </div>
-                        {/* Glow effect on hover */}
                         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-purple-500/0 to-pink-500/0 rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
                       </div>
                     </div>
@@ -533,16 +775,14 @@ function Home() {
           </div>
         </section>
 
-        {/* Projects Section - Futuristic Grid */}
+        {/* Projects Section (unchanged) */}
         <section id="projects" className="mb-20 sm:mb-32 scroll-mt-20">
+          {/* ... keep existing projects section ... */}
           <div className="max-w-7xl mx-auto">
-            {/* Section Header */}
             <div className="text-center mb-12 sm:mb-16">
               <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-1.5 sm:py-2.5 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-full border border-cyan-500/30 mb-4 sm:mb-6 backdrop-blur-sm">
                 <FaRocket className="text-cyan-300 text-xs sm:text-sm" />
-                <span className="text-xs sm:text-sm font-mono tracking-widest text-cyan-300">
-                  PORTFOLIO
-                </span>
+                <span className="text-xs sm:text-sm font-mono tracking-widest text-cyan-300">PORTFOLIO</span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
                 <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">DIGITAL</span>{" "}
@@ -553,7 +793,6 @@ function Home() {
               </p>
             </div>
 
-            {/* Projects Grid - Futuristic */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
               {[
                 {
@@ -602,16 +841,11 @@ function Home() {
                   className="group relative bg-gradient-to-br from-gray-900/50 via-black/50 to-gray-900/50 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-cyan-500/20 shadow-lg sm:shadow-xl transition-all duration-700 cursor-pointer overflow-hidden hover:scale-[1.02] hover:border-purple-500/40 hover:shadow-xl sm:hover:shadow-2xl hover:shadow-cyan-500/10"
                   onClick={() => window.open(project.url, "_blank")}
                 >
-                  {/* Animated Background Glow */}
                   <div className={`absolute inset-0 bg-gradient-to-br ${project.glow} opacity-0 group-hover:opacity-30 transition-opacity duration-700 rounded-2xl sm:rounded-3xl`}></div>
-                  
-                  {/* Project Number */}
                   <div className="absolute top-2 sm:top-4 right-2 sm:right-4 w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
                     <span className="text-cyan-300 text-xs sm:text-sm font-mono">0{index + 1}</span>
                   </div>
-                  
                   <div className="relative">
-                    {/* Project Image */}
                     {project.img ? (
                       <div className="relative rounded-lg sm:rounded-xl md:rounded-2xl mb-4 sm:mb-6 overflow-hidden border border-gray-700/50 group-hover:border-cyan-500/30 transition-all duration-500">
                         <img
@@ -620,7 +854,6 @@ function Home() {
                           className="w-full h-40 sm:h-48 md:h-56 object-cover group-hover:scale-105 transition-transform duration-700"
                           onError={handleProjectError}
                         />
-                        {/* Overlay Gradient */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-70 group-hover:opacity-50 transition-opacity duration-500"></div>
                       </div>
                     ) : (
@@ -638,18 +871,12 @@ function Home() {
                         ))}
                       </div>
                     )}
-
-                    {/* Project Title */}
                     <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-500 tracking-wider">
                       {project.title}
                     </h3>
-
-                    {/* Project Description */}
                     <p className="mb-4 sm:mb-5 text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed group-hover:text-gray-200 transition-colors duration-300">
                       {project.desc}
                     </p>
-
-                    {/* Tech Tags - Futuristic */}
                     <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-6">
                       {project.tech.map((tech, techIdx) => (
                         <span
@@ -660,8 +887,6 @@ function Home() {
                         </span>
                       ))}
                     </div>
-
-                    {/* View Project Link */}
                     <div className="flex items-center justify-between">
                       <span className="text-gray-400 font-medium text-xs sm:text-sm group-hover:text-cyan-300 group-hover:tracking-wider transition-all duration-300 flex items-center gap-1 sm:gap-2">
                         <FaExternalLinkAlt className="text-xs" />
@@ -673,8 +898,6 @@ function Home() {
                       </div>
                     </div>
                   </div>
-
-                  {/* Animated Border */}
                   <div className="absolute bottom-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 </div>
               ))}
@@ -682,14 +905,13 @@ function Home() {
           </div>
         </section>
 
-        {/* Certificates Section - Futuristic Gallery */}
+        {/* Certificates Section (unchanged) */}
         <section id="certificates" className="mb-20 sm:mb-32 scroll-mt-20">
+          {/* ... keep existing certificates section ... */}
           <div className="text-center mb-12 sm:mb-16">
             <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-1.5 sm:py-2.5 bg-gradient-to-r from-indigo-500/10 via-blue-500/10 to-cyan-500/10 rounded-full border border-indigo-500/30 mb-4 sm:mb-6 backdrop-blur-sm">
               <FaCertificate className="text-indigo-300 text-xs sm:text-sm" />
-              <span className="text-xs sm:text-sm font-mono tracking-widest text-indigo-300">
-                CREDENTIALS
-              </span>
+              <span className="text-xs sm:text-sm font-mono tracking-widest text-indigo-300">CREDENTIALS</span>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
               <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">DIGITAL</span>{" "}
@@ -700,7 +922,6 @@ function Home() {
             </p>
           </div>
 
-          {/* Tab Navigation - Futuristic */}
           <div className="flex gap-2 sm:gap-3 justify-center mb-8 sm:mb-12 flex-wrap px-2">
             <button
               onClick={() => setCertTab("certificates")}
@@ -721,23 +942,23 @@ function Home() {
                   ? "bg-gradient-to-r from-indigo-600/20 via-blue-600/20 to-cyan-600/20 text-white border border-cyan-500/30 shadow-lg shadow-cyan-500/20"
                   : "bg-gradient-to-r from-gray-800/70 to-black/70 text-gray-300 border border-gray-700/50 hover:border-cyan-500/30 hover:text-cyan-300"
               }`}
-            >
+            > 
               <FaComments className="text-xs sm:text-sm" />
               <span className="hidden sm:inline">WEBINARS</span>
               <span className="sm:hidden">WEBINARS</span>
             </button>
           </div>
 
-          {/* Certificates Grid - Futuristic */}
           {certTab === "certificates" && (
             <div className="max-w-7xl mx-auto px-2 sm:px-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-                {[ {
-    name: "DATA ANALYTICS ESSENTIALS",
-    subtitle: "Learn the essential tools of the trade.",
-    file: "DATAAL.png",
-    color: "from-orange-500/20 to-yellow-500/20"
-  },
+                {[
+                  {
+                    name: "DATA ANALYTICS ESSENTIALS",
+                    subtitle: "Learn the essential tools of the trade.",
+                    file: "DATAAL.png",
+                    color: "from-orange-500/20 to-yellow-500/20"
+                  },
                   {
                     name: "AI FUNDAMENTALS",
                     subtitle: "IBM SkillsBuild",
@@ -769,12 +990,11 @@ function Home() {
                     color: "from-green-500/20 to-emerald-500/20"
                   },
                   {
-                    name: "MODERN AI",
+                    name: "AI ENGINEER",
                     subtitle: "Machine Learning",
                     file: "aii.png",
                     color: "from-orange-500/20 to-red-500/20"
                   }
-                  
                 ].map((cert, index) => (
                   <div
                     key={index}
@@ -784,10 +1004,7 @@ function Home() {
                       certificateDialog.open();
                     }}
                   >
-                    {/* Background Glow */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${cert.color} opacity-0 group-hover:opacity-30 transition-opacity duration-700 rounded-xl sm:rounded-2xl md:rounded-3xl`}></div>
-                    
-                    {/* Certificate Image */}
                     <div className="relative rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden mb-3 sm:mb-4 md:mb-5 border border-gray-700/50 group-hover:border-cyan-500/30 transition-all duration-500">
                       <img
                         src={cert.file}
@@ -795,15 +1012,11 @@ function Home() {
                         className="w-full h-40 sm:h-48 md:h-56 object-cover group-hover:scale-105 transition-transform duration-700"
                         onError={handleCertError}
                       />
-                      {/* Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500"></div>
-                      {/* Badge Number */}
                       <div className="absolute top-2 sm:top-3 right-2 sm:right-3 w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-r from-cyan-500/30 to-purple-500/30 border border-cyan-500/50 flex items-center justify-center">
                         <span className="text-white text-xs font-bold">{index + 1}</span>
                       </div>
                     </div>
-                    
-                    {/* Certificate Info */}
                     <div className="relative text-center px-1">
                       <p className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-500">
                         {cert.name}
@@ -819,12 +1032,11 @@ function Home() {
             </div>
           )}
 
-          {/* Webinars Grid */}
           {certTab === "webinars" && (
             <div className="max-w-7xl mx-auto px-2 sm:px-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
                 {[
-                   {
+                  {
                     name: "Data Privacy, Freedom of Information, and AI Safety",
                     subtitle: "Certificate of Attendance",
                     file: "CER.png",
@@ -835,8 +1047,7 @@ function Home() {
                     subtitle: "Digital Safety Protocol",
                     file: "lheng-digital-safety.jpg",
                     color: "from-cyan-500/20 to-blue-500/20"
-                  },
-                  
+                  }
                 ].map((webinar, index) => (
                   <div
                     key={index}
@@ -847,7 +1058,6 @@ function Home() {
                     }}
                   >
                     <div className={`absolute inset-0 bg-gradient-to-br ${webinar.color} opacity-0 group-hover:opacity-30 transition-opacity duration-700 rounded-xl sm:rounded-2xl md:rounded-3xl`}></div>
-                    
                     <div className="relative rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden mb-3 sm:mb-4 md:mb-5 border border-gray-700/50 group-hover:border-cyan-500/30 transition-all duration-500">
                       <img
                         src={webinar.file}
@@ -860,7 +1070,6 @@ function Home() {
                         <span className="text-white text-xs font-bold">★</span>
                       </div>
                     </div>
-                    
                     <div className="relative text-center px-1">
                       <p className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-500">
                         {webinar.name}
@@ -877,20 +1086,16 @@ function Home() {
           )}
         </section>
 
-        {/* Contact Section - Futuristic */}
+        {/* Contact Section (unchanged) */}
         <section id="contact" className="mb-12 sm:mb-20 scroll-mt-20">
           <div className="bg-gradient-to-br from-gray-900/40 via-black/40 to-gray-900/40 backdrop-blur-2xl rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 lg:p-10 border border-cyan-500/20 shadow-xl sm:shadow-2xl shadow-cyan-500/10 overflow-hidden relative">
-            {/* Animated Background */}
             <div className="absolute top-0 right-0 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-gradient-to-br from-cyan-500/10 via-transparent to-purple-500/10 rounded-full blur-3xl animate-spin-slow"></div>
             <div className="absolute bottom-0 left-0 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-gradient-to-tr from-purple-500/10 via-transparent to-pink-500/10 rounded-full blur-3xl animate-spin-slow animation-delay-1000"></div>
-            
             <div className="relative z-10">
               <div className="text-center mb-6 sm:mb-8 md:mb-10">
                 <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-1.5 sm:py-2.5 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-full border border-cyan-500/30 mb-4 sm:mb-6 backdrop-blur-sm">
                   <FaComments className="text-cyan-300 text-xs sm:text-sm" />
-                  <span className="text-xs sm:text-sm font-mono tracking-widest text-cyan-300">
-                    CONNECT
-                  </span>
+                  <span className="text-xs sm:text-sm font-mono tracking-widest text-cyan-300">CONNECT</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
                   <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">LET'S</span>{" "}
@@ -900,9 +1105,7 @@ function Home() {
                   Ready to bring your digital vision to life?
                 </p>
               </div>
-
               <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 lg:gap-12">
-                {/* Contact Info - Futuristic - RESPONSIVE FIX */}
                 <div>
                   <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sm:mb-6 md:mb-8 tracking-wider">
                     <FaBolt className="inline mr-2 text-cyan-400 text-sm sm:text-base" />
@@ -922,22 +1125,14 @@ function Home() {
                           <span className="text-white text-sm sm:text-base md:text-lg">{info.icon}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-gray-400 tracking-widest font-mono mb-0.5">
-                            {info.label}
-                          </p>
-                          <p className="text-white font-medium text-xs sm:text-sm md:text-base truncate hover:text-clip hover:whitespace-normal break-words">
-                            {info.value}
-                          </p>
+                          <p className="text-xs text-gray-400 tracking-widest font-mono mb-0.5">{info.label}</p>
+                          <p className="text-white font-medium text-xs sm:text-sm md:text-base truncate hover:text-clip hover:whitespace-normal break-words">{info.value}</p>
                         </div>
                       </div>
                     ))}
                   </div>
-
-                  {/* Social Links - Futuristic */}
                   <div className="mt-6 sm:mt-8 md:mt-10">
-                    <h4 className="text-base sm:text-lg md:text-xl font-bold text-white mb-3 sm:mb-4 md:mb-6 tracking-wider">
-                      FOLLOW THE JOURNEY
-                    </h4>
+                    <h4 className="text-base sm:text-lg md:text-xl font-bold text-white mb-3 sm:mb-4 md:mb-6 tracking-wider">FOLLOW THE JOURNEY</h4>
                     <div className="flex flex-wrap gap-2 sm:gap-3">
                       {socialLinks.map((link, idx) => (
                         <a
@@ -954,8 +1149,6 @@ function Home() {
                     </div>
                   </div>
                 </div>
-
-                {/* Contact Form - Futuristic */}
                 <div className="mt-6 lg:mt-0">
                   <form className="space-y-3 sm:space-y-4 md:space-y-5">
                     <div className="relative">
@@ -998,7 +1191,7 @@ function Home() {
         </section>
       </div>
 
-      {/* Footer - Futuristic */}
+      {/* Footer (unchanged) */}
       <footer className="border-t border-cyan-500/20 bg-black/50 backdrop-blur-2xl py-6 sm:py-8 md:py-10 lg:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -1023,7 +1216,7 @@ function Home() {
         </div>
       </footer>
 
-      {/* Profile Dialog - Futuristic */}
+      {/* Dialogs (unchanged) */}
       <Dialog
         isOpen={profileDialog.isOpen}
         onClose={profileDialog.close}
@@ -1048,22 +1241,17 @@ function Home() {
             />
           </div>
           <div className="text-center px-2">
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">
-              ROSSELLAH MARIE BODAÑO
-            </h3>
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">ROSSELLAH MARIE BODAÑO</h3>
             <p className="text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text font-bold text-xs sm:text-sm md:text-base tracking-wider mb-2 sm:mb-3">
               DIGITAL ARTISAN & CREATIVE DEVELOPER
             </p>
             <div className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-full border border-cyan-500/30">
-              <span className="text-cyan-300 text-xs sm:text-sm font-mono tracking-wider">
-                IT STUDENT • FRONTEND SPECIALIST
-              </span>
+              <span className="text-cyan-300 text-xs sm:text-sm font-mono tracking-wider">IT STUDENT • FRONTEND SPECIALIST</span>
             </div>
           </div>
         </div>
       </Dialog>
 
-      {/* Certificate Dialog - Futuristic */}
       <Dialog
         isOpen={certificateDialog.isOpen}
         onClose={certificateDialog.close}
@@ -1106,7 +1294,52 @@ function Home() {
         )}
       </Dialog>
 
-      {/* About Dialog - Futuristic */}
+      <Dialog
+        isOpen={resumeDialog.isOpen}
+        onClose={resumeDialog.close}
+        title={
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-md sm:rounded-lg bg-gradient-to-r from-cyan-500 to-green-500 flex items-center justify-center">
+              <FaFileAlt className="text-white text-xs sm:text-sm" />
+            </div>
+            <span className="text-white font-bold text-sm sm:text-base tracking-wider">RESUME</span>
+          </div>
+        }
+        className="bg-gradient-to-br from-gray-900/90 via-black/90 to-gray-900/90 border border-cyan-500/20 backdrop-blur-2xl max-w-[95vw] sm:max-w-3xl md:max-w-4xl"
+      >
+        <div className="flex flex-col items-center gap-4 sm:gap-6">
+          <div className="relative w-full rounded-lg sm:rounded-xl overflow-hidden border border-cyan-500/30 bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-2 sm:p-3">
+            <div className="relative w-full max-h-[60vh] sm:max-h-[70vh] overflow-y-auto custom-scrollbar">
+              <img
+                src="/resume.jpg"
+                alt="Rossellah Marie Bodaño Resume"
+                className="w-full h-auto object-contain rounded-lg"
+                onError={handleResumeError}
+              />
+              <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 bg-black/70 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 sm:py-1.5 border border-cyan-500/30">
+                <span className="text-[10px] sm:text-xs text-cyan-300 font-mono flex items-center gap-1">
+                  <FaImage className="text-[10px] sm:text-xs" /> PREVIEW
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
+            <button
+              onClick={handleResumePDFDownload}
+              className="flex-1 px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-lg sm:rounded-xl hover:shadow-lg sm:hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm tracking-wider hover:scale-105"
+            >
+              <FaFilePdf className="text-sm sm:text-lg" /> DOWNLOAD PDF
+            </button>
+            <button
+              onClick={handleResumeImageDownload}
+              className="flex-1 px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg sm:rounded-xl hover:shadow-lg sm:hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm tracking-wider hover:scale-105"
+            >
+              <FaFileImage className="text-sm sm:text-lg" /> DOWNLOAD IMAGE
+            </button>
+          </div>
+        </div>
+      </Dialog>
+
       <Dialog
         isOpen={aboutDialog.isOpen}
         onClose={aboutDialog.close}
@@ -1150,122 +1383,37 @@ function Home() {
         </div>
       </Dialog>
 
-      {/* Custom Animations */}
       <style jsx>{`
         @keyframes gradient {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
+          0%,100%{background-position:0% 50%}
+          50%{background-position:100% 50%}
         }
-        .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradient 3s ease infinite;
-        }
-        
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .animate-spin-slow {
-          animation: spin-slow 20s linear infinite;
-        }
-        
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-slideDown {
-          animation: slideDown 0.3s ease-out forwards;
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes gradient-border {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        .animate-gradient-border {
-          background-size: 200% 200%;
-          animation: gradient-border 2s ease infinite;
-        }
-        
-        @keyframes gridMove {
-          0% { background-position: 0 0; }
-          100% { background-position: 50px 50px; }
-        }
-        
-        @keyframes glitch {
-          0% { transform: translate(0); }
-          20% { transform: translate(-2px, 2px); }
-          40% { transform: translate(-2px, -2px); }
-          60% { transform: translate(2px, 2px); }
-          80% { transform: translate(2px, -2px); }
-          100% { transform: translate(0); }
-        }
-        .animate-glitch {
-          animation: glitch 0.3s linear;
-        }
-        
-        .animation-delay-500 {
-          animation-delay: 500ms;
-        }
-        
-        .animation-delay-1000 {
-          animation-delay: 1000ms;
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-          width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-          background: rgba(0, 0, 0, 0.3);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-          background: linear-gradient(to bottom, #06b6d4, #8b5cf6, #ec4899);
-          border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(to bottom, #0891b2, #7c3aed, #db2777);
-        }
-        
-        /* Text selection */
-        ::selection {
-          background: rgba(6, 182, 212, 0.3);
-          color: white;
-        }
-        
-        /* Smooth transitions */
-        * {
-          transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        /* Mobile optimizations */
-        @media (max-width: 640px) {
-          .text-balance {
-            text-wrap: balance;
-          }
-        }
-
-        /* Prevent text overflow */
-        .break-words {
-          overflow-wrap: break-word;
-          word-break: break-word;
-        }
+        .animate-gradient{background-size:200% 200%;animation:gradient 3s ease infinite}
+        @keyframes spin-slow{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+        .animate-spin-slow{animation:spin-slow 20s linear infinite}
+        @keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+        .animate-slideDown{animation:slideDown 0.3s ease-out forwards}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+        .animate-float{animation:float 3s ease-in-out infinite}
+        @keyframes gradient-border{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+        .animate-gradient-border{background-size:200% 200%;animation:gradient-border 2s ease infinite}
+        @keyframes gridMove{0%{background-position:0 0}100%{background-position:50px 50px}}
+        @keyframes glitch{0%{transform:translate(0)}20%{transform:translate(-2px,2px)}40%{transform:translate(-2px,-2px)}60%{transform:translate(2px,2px)}80%{transform:translate(2px,-2px)}100%{transform:translate(0)}}
+        .animate-glitch{animation:glitch 0.3s linear}
+        .animation-delay-500{animation-delay:500ms}
+        .animation-delay-1000{animation-delay:1000ms}
+        .perspective-1000{perspective:1000px}
+        ::-webkit-scrollbar{width:8px}
+        ::-webkit-scrollbar-track{background:rgba(0,0,0,0.3)}
+        ::-webkit-scrollbar-thumb{background:linear-gradient(to bottom,#06b6d4,#8b5cf6,#ec4899);border-radius:4px}
+        ::-webkit-scrollbar-thumb:hover{background:linear-gradient(to bottom,#0891b2,#7c3aed,#db2777)}
+        .custom-scrollbar::-webkit-scrollbar{width:6px}
+        .custom-scrollbar::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px}
+        .custom-scrollbar::-webkit-scrollbar-thumb{background:linear-gradient(to bottom,#06b6d4,#8b5cf6);border-radius:10px}
+        ::selection{background:rgba(6,182,212,0.3);color:white}
+        *{transition:background-color 0.3s ease,border-color 0.3s ease}
+        @media (max-width:640px){.text-balance{text-wrap:balance}}
+        .break-words{overflow-wrap:break-word;word-break:break-word}
       `}</style>
     </div>
   );
