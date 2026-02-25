@@ -28,8 +28,9 @@ export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], 
       <Canvas
         camera={{ position: position, fov: fov }}
         dpr={[1, isMobile ? 1.5 : 2]}
-        gl={{ alpha: transparent }}
+        gl={{ alpha: transparent, powerPreference: "high-performance" }}
         onCreated={({ gl }) => gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)}
+        onError={(error) => console.error('Canvas error', error)}
       >
         <ambientLight intensity={Math.PI} />
         <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60}>
@@ -83,13 +84,25 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }) {
   const rot = new THREE.Vector3();
   const dir = new THREE.Vector3();
 
-  const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 };
+  // FIX: prevent bodies from sleeping, lower damping for livelier movement
+  const segmentProps = {
+    type: 'dynamic',
+    canSleep: false,          // ensures joints always update
+    colliders: false,
+    angularDamping: 0.5,      // reduced from 4
+    linearDamping: 0.5,       // reduced from 4
+  };
+
   const { nodes, materials } = useGLTF(cardGLB);
-  const texture = useTexture(lanyard);
+  // FIX: add load/error callbacks for lace texture
+  const texture = useTexture(
+    lanyard,
+    (tex) => console.log('Lace texture loaded'),
+    (err) => console.warn('Lace texture failed to load, using fallback', err)
+  );
   const photoMap = useTexture('/we.png');
 
-  // Get viewport (not strictly needed, but available if you prefer pixel‑based resolution)
-  const { viewport } = useThree();
+  const { size } = useThree(); // for resolution prop
 
   // notify parent when GLTF + textures are ready
   useEffect(() => {
@@ -178,7 +191,12 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }) {
   });
 
   curve.curveType = 'chordal';
-  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  if (texture) {
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  }
+
+  // FIX: increase line width on mobile and add resolution prop
+  const lineWidth = isMobile ? 1.2 : 0.6;
 
   return (
     <>
@@ -226,13 +244,14 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }) {
       <mesh ref={band}>
         <meshLineGeometry />
         <meshLineMaterial
-  color="white"
-  depthTest={false}
-  useMap
-  map={texture}
-  repeat={[-4, 1]}
-  lineWidth={0.6}   // ← increased from 0.3 to 0.6 – adjust as needed
-/>
+          color="white"
+          depthTest={false}
+          useMap
+          map={texture}
+          repeat={[-4, 1]}
+          lineWidth={lineWidth}
+          resolution={[size.width, size.height]} // helps with sharpness on mobile
+        />
       </mesh>
     </>
   );
