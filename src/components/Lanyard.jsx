@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 'use client';
 import { useEffect, useRef, useState, useMemo } from 'react';
-import { Canvas, extend, useFrame } from '@react-three/fiber';
+import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, useTexture, Environment, Lightformer } from '@react-three/drei';
 import { BallCollider, CuboidCollider, Physics, RigidBody, useRopeJoint, useSphericalJoint } from '@react-three/rapier';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
@@ -87,6 +87,9 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }) {
   const { nodes, materials } = useGLTF(cardGLB);
   const texture = useTexture(lanyard);
   const photoMap = useTexture('/we.png');
+
+  // Get viewport (not strictly needed, but available if you prefer pixel‑based resolution)
+  const { viewport } = useThree();
 
   // notify parent when GLTF + textures are ready
   useEffect(() => {
@@ -225,11 +228,10 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }) {
   <meshLineMaterial
     color="white"
     depthTest={false}
-    resolution={isMobile ? [1000, 2000] : [1000, 1000]}
     useMap
     map={texture}
     repeat={[-4, 1]}
-    lineWidth={2}          // ← increased from 1 to 2
+    lineWidth={1.2} // 👈 Increased to 1.2 – adjust to your liking (try 1.0–1.5)
   />
 </mesh>
     </>
