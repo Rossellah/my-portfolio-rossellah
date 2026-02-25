@@ -1,0 +1,105 @@
+.lanyard-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: transparent;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .lanyard-wrapper {
+    height: 350px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .lanyard-wrapper {
+    height: 400px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .lanyard-wrapper {
+    height: 450px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .lanyard-wrapper {
+    height: 500px;
+  }
+}
+
+/* Loading state */
+.lanyard-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #06b6d4;
+  font-family: monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Error state */
+.lanyard-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ef4444;
+  font-family: monospace;
+  font-size: 12px;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Interactive hint */
+.lanyard-hint {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-family: monospace;
+  color: #06b6d4;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  white-space: nowrap;
+  animation: fadeInOut 2s ease-in-out infinite;
+  z-index: 10;
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .lanyard-hint {
+    font-size: 8px;
+    padding: 2px 8px;
+    bottom: 5px;
+  }
+}

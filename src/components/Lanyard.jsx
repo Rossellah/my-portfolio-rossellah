@@ -1,31 +1,21 @@
 /* eslint-disable react/no-unknown-property */
 'use client';
-import { useEffect, useRef, useState, MutableRefObject, useMemo } from 'react';
-import { Canvas, extend, useFrame, ThreeEvent } from '@react-three/fiber';
+import { useEffect, useRef, useState, useMemo } from 'react';
+import { Canvas, extend, useFrame } from '@react-three/fiber';
 import { useGLTF, useTexture, Environment, Lightformer } from '@react-three/drei';
 import { BallCollider, CuboidCollider, Physics, RigidBody, useRopeJoint, useSphericalJoint } from '@react-three/rapier';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 
 // public assets served at runtime — use URL strings instead of static imports
-const cardGLB = '/assets/lanyard/card.glb';
-  const lanyard = '/assets/lanyard/lace.png';
+const cardGLB = '/card.glb';
+const lanyard = '/lace.png';
 
 import * as THREE from 'three';
 
 extend({ MeshLineGeometry, MeshLineMaterial });
 
-type Vec3 = [number, number, number];
-
-type LanyardProps = {
-  position?: Vec3;
-  gravity?: Vec3;
-  fov?: number;
-  transparent?: boolean;
-  onLoad?: () => void;
-};
-
-export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], fov = 20, transparent = true, onLoad }: LanyardProps) {
-  const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth < 768);
+export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], fov = 20, transparent = true, onLoad }) {
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -79,24 +69,25 @@ export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], 
     </div>
   );
 }
-function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }: { maxSpeed?: number; minSpeed?: number; isMobile?: boolean; onLoad?: () => void }) {
-  const band = useRef<any>(null) as MutableRefObject<any>;
-  const fixed = useRef<any>(null) as MutableRefObject<any>;
-  const j1 = useRef<any>(null) as MutableRefObject<any>;
-  const j2 = useRef<any>(null) as MutableRefObject<any>;
-  const j3 = useRef<any>(null) as MutableRefObject<any>;
-  const card = useRef<any>(null) as MutableRefObject<any>;
+
+function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }) {
+  const band = useRef(null);
+  const fixed = useRef(null);
+  const j1 = useRef(null);
+  const j2 = useRef(null);
+  const j3 = useRef(null);
+  const card = useRef(null);
 
   const vec = new THREE.Vector3();
   const ang = new THREE.Vector3();
   const rot = new THREE.Vector3();
   const dir = new THREE.Vector3();
 
-  const segmentProps: any = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 };
-  const { nodes, materials }: any = useGLTF(cardGLB as unknown as string);
-  const texture: any = useTexture(lanyard as unknown as string);
-  const photoMap: any = useTexture('/assets/lanyard/id.png');
-  
+  const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 };
+  const { nodes, materials } = useGLTF(cardGLB);
+  const texture = useTexture(lanyard);
+  const photoMap = useTexture('/we.png');
+
   // notify parent when GLTF + textures are ready
   useEffect(() => {
     if (nodes && photoMap) onLoad?.();
@@ -105,10 +96,15 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }: { maxSp
   // GLTF UVs expect textures with flipY=false; ensure the photo texture matches
   if (photoMap) {
     photoMap.flipY = false;
-    photoMap.encoding = THREE.sRGBEncoding;
+    // For Three.js r152+ use colorSpace instead of encoding
+    if (THREE.sRGBEncoding !== undefined) {
+      photoMap.encoding = THREE.sRGBEncoding;
+    } else {
+      photoMap.colorSpace = THREE.SRGBColorSpace;
+    }
     photoMap.needsUpdate = true;
   }
-  
+
   // create a material instance to avoid JSX prop typing errors
   const cardMaterial = useMemo(() => {
     const m = new THREE.MeshStandardMaterial({
@@ -120,24 +116,24 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }: { maxSp
     });
     return m;
   }, [photoMap, materials]);
-  
+
   useEffect(() => {
     return () => {
-      cardMaterial?.dispose && cardMaterial.dispose();
+      cardMaterial?.dispose?.();
     };
   }, [cardMaterial]);
 
-  const [curve] = useState<any>(() =>
+  const [curve] = useState(() =>
     new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])
   );
-  const [dragged, drag] = useState<any>(false);
-  const [hovered, hover] = useState<boolean>(false);
+  const [dragged, drag] = useState(false);
+  const [hovered, hover] = useState(false);
 
-  // joints expect refs; typing here is kept loose to match runtime shapes
-  useRopeJoint(fixed as any, j1 as any, [[0, 0, 0], [0, 0, 0], 1]);
-  useRopeJoint(j1 as any, j2 as any, [[0, 0, 0], [0, 0, 0], 1]);
-  useRopeJoint(j2 as any, j3 as any, [[0, 0, 0], [0, 0, 0], 1]);
-  useSphericalJoint(j3 as any, card as any, [
+  // joints expect refs
+  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
+  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);
+  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1]);
+  useSphericalJoint(j3, card, [
     [0, 0, 0],
     [0, 1.5, 0]
   ]);
@@ -154,9 +150,12 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }: { maxSp
       vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);
       dir.copy(vec).sub(state.camera.position).normalize();
       vec.add(dir.multiplyScalar(state.camera.position.length()));
-      [card, j1, j2, j3, fixed].forEach(ref => ref.current?.wakeUp && ref.current?.wakeUp());
-      card.current?.setNextKinematicTranslation &&
-        card.current.setNextKinematicTranslation({ x: vec.x - dragged.x, y: vec.y - dragged.y, z: vec.z - dragged.z });
+      [card, j1, j2, j3, fixed].forEach(ref => ref.current?.wakeUp?.());
+      card.current?.setNextKinematicTranslation?.({
+        x: vec.x - dragged.x,
+        y: vec.y - dragged.y,
+        z: vec.z - dragged.z
+      });
     }
     if (fixed.current) {
       [j1, j2].forEach(ref => {
@@ -171,7 +170,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }: { maxSp
       band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32));
       ang.copy(card.current.angvel());
       rot.copy(card.current.rotation());
-      card.current.setAngvel && card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
+      card.current.setAngvel?.({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
     }
   });
 
@@ -191,17 +190,25 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }: { maxSp
         <RigidBody position={[1.5, 0, 0]} ref={j3} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
-        <RigidBody position={[2, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
+        <RigidBody
+          position={[2, 0, 0]}
+          ref={card}
+          {...segmentProps}
+          type={dragged ? 'kinematicPosition' : 'dynamic'}
+        >
           <CuboidCollider args={[0.8, 1.125, 0.01]} />
           <group
             scale={2.25}
             position={[0, -1.2, -0.05]}
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
-            onPointerUp={(e: ThreeEvent<PointerEvent>) => ((e.target as any).releasePointerCapture(e.pointerId), drag(false))}
-            onPointerDown={(e: ThreeEvent<PointerEvent>) => {
-              (e.target as any).setPointerCapture(e.pointerId);
-              const point = (e as any).point as any;
+            onPointerUp={(e) => {
+              e.target.releasePointerCapture(e.pointerId);
+              drag(false);
+            }}
+            onPointerDown={(e) => {
+              e.target.setPointerCapture(e.pointerId);
+              const point = e.point;
               drag(new THREE.Vector3().copy(point).sub(vec.copy(card.current.translation())));
             }}
           >
@@ -214,17 +221,17 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }: { maxSp
         </RigidBody>
       </group>
       <mesh ref={band}>
-        <meshLineGeometry />
-        <meshLineMaterial
-          color="white"
-          depthTest={false}
-          resolution={isMobile ? [1000, 2000] : [1000, 1000]}
-          useMap
-          map={texture}
-          repeat={[-4, 1]}
-          lineWidth={1}
-        />
-      </mesh>
+  <meshLineGeometry />
+  <meshLineMaterial
+    color="white"
+    depthTest={false}
+    resolution={isMobile ? [1000, 2000] : [1000, 1000]}
+    useMap
+    map={texture}
+    repeat={[-4, 1]}
+    lineWidth={2}          // ← increased from 1 to 2
+  />
+</mesh>
     </>
   );
 }
