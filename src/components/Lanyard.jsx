@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unknown-property */
 'use client';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
@@ -6,7 +5,6 @@ import { useGLTF, useTexture, Environment, Lightformer } from '@react-three/drei
 import { BallCollider, CuboidCollider, Physics, RigidBody, useRopeJoint, useSphericalJoint } from '@react-three/rapier';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 
-// public assets served at runtime — use URL strings instead of static imports
 const cardGLB = '/card.glb';
 const lanyard = '/lace.png';
 
@@ -84,17 +82,16 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }) {
   const rot = new THREE.Vector3();
   const dir = new THREE.Vector3();
 
-  // FIX: prevent bodies from sleeping, lower damping for livelier movement
   const segmentProps = {
     type: 'dynamic',
-    canSleep: false,          // ensures joints always update
+    canSleep: false,          
     colliders: false,
-    angularDamping: 0.5,      // reduced from 4
-    linearDamping: 0.5,       // reduced from 4
+    angularDamping: 0.5,      
+    linearDamping: 0.5,       
   };
 
   const { nodes, materials } = useGLTF(cardGLB);
-  // FIX: add load/error callbacks for lace texture
+
   const texture = useTexture(
     lanyard,
     (tex) => console.log('Lace texture loaded'),
@@ -102,17 +99,17 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }) {
   );
   const photoMap = useTexture('/we.png');
 
-  const { size } = useThree(); // for resolution prop
+  const { size } = useThree(); 
 
-  // notify parent when GLTF + textures are ready
+  
   useEffect(() => {
     if (nodes && photoMap) onLoad?.();
   }, [nodes, photoMap, onLoad]);
 
-  // GLTF UVs expect textures with flipY=false; ensure the photo texture matches
+  
   if (photoMap) {
     photoMap.flipY = false;
-    // For Three.js r152+ use colorSpace instead of encoding
+ 
     if (THREE.sRGBEncoding !== undefined) {
       photoMap.encoding = THREE.sRGBEncoding;
     } else {
@@ -121,7 +118,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }) {
     photoMap.needsUpdate = true;
   }
 
-  // create a material instance to avoid JSX prop typing errors
+
   const cardMaterial = useMemo(() => {
     const m = new THREE.MeshStandardMaterial({
       map: photoMap || null,
@@ -195,7 +192,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }) {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
   }
 
-  // FIX: increase line width on mobile and add resolution prop
+
   const lineWidth = isMobile ? 1.2 : 0.6;
 
   return (
@@ -250,7 +247,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }) {
           map={texture}
           repeat={[-4, 1]}
           lineWidth={lineWidth}
-          resolution={[size.width, size.height]} // helps with sharpness on mobile
+          resolution={[size.width, size.height]} 
         />
       </mesh>
     </>
