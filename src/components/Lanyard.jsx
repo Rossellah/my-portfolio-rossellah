@@ -224,16 +224,16 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, onLoad }) {
         </RigidBody>
       </group>
       <mesh ref={band}>
-  <meshLineGeometry />
-  <meshLineMaterial
-    color="white"
-    depthTest={false}
-    useMap
-    map={texture}
-    repeat={[-4, 1]}
-    lineWidth={1.2} // 👈 Increased to 1.2 – adjust to your liking (try 1.0–1.5)
-  />
-</mesh>
+        <meshLineGeometry />
+        <meshLineMaterial
+  color="white"
+  depthTest={false}
+  useMap
+  map={texture}
+  repeat={[-4, 1]}
+  lineWidth={0.6}   // ← increased from 0.3 to 0.6 – adjust as needed
+/>
+      </mesh>
     </>
   );
 }
