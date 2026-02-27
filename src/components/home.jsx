@@ -51,8 +51,9 @@ import {
 } from "react-icons/fa";
 import { SiTailwindcss, SiTypescript, SiNextdotjs, SiVercel, SiNetlify } from "react-icons/si";
 import { Dialog, useDialog } from "./Dialog";
-import { motion, useMotionValue, useSpring } from "framer-motion";
-import Lanyard from "./Lanyard"; // Import the Lanyard component
+import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
+import Lanyard from "./Lanyard";
+import CircularText from "./CircularText";
 
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -60,7 +61,8 @@ function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [particles, setParticles] = useState([]);
-  const profileDialog = useDialog();
+  // New state for hover effect on profile image
+  const [isHoveringProfile, setIsHoveringProfile] = useState(false);
   const [selectedCert, setSelectedCert] = useState(null);
   const certificateDialog = useDialog();
   const [certTab, setCertTab] = useState("certificates");
@@ -76,24 +78,21 @@ function Home() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [blink, setBlink] = useState(true);
   
-  // Full name for typing animation
   const fullName = "ROSSELLAH MARIE BODAÑO";
 
   const profileImageUrl = "/lhengie.jpg";
   const idCardImageUrl = "/we.png";
-  // Typing animation effect
+
   useEffect(() => {
     const typingSpeed = isDeleting ? 50 : 100;
     const pauseTime = 2000;
     
     if (!isDeleting && nameIndex === fullName.length) {
-      // Finished typing, pause then start deleting
       setTimeout(() => setIsDeleting(true), pauseTime);
       return;
     }
     
     if (isDeleting && nameIndex === 0) {
-      // Finished deleting, pause then start typing again
       setTimeout(() => setIsDeleting(false), pauseTime / 2);
       return;
     }
@@ -111,22 +110,18 @@ function Home() {
     return () => clearTimeout(timer);
   }, [nameIndex, isDeleting, fullName]);
 
-  // Blinking cursor effect for subtitle
   useEffect(() => {
     const blinkInterval = setInterval(() => {
       setBlink(prev => !prev);
     }, 500);
-    
     return () => clearInterval(blinkInterval);
   }, []);
 
-  // Toggle theme function
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     localStorage.setItem('theme', !isDarkMode ? 'dark' : 'light');
   };
 
-  // Load theme preference from localStorage on mount
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
@@ -134,7 +129,6 @@ function Home() {
     }
   }, []);
 
-  // Handle scroll effect for navbar
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -143,10 +137,9 @@ function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Create floating particles (with enhanced light mode particles)
   useEffect(() => {
     const newParticles = [];
-    const particleCount = isDarkMode ? 50 : 30; // Fewer particles in light mode but still present
+    const particleCount = isDarkMode ? 50 : 30;
     
     for (let i = 0; i < particleCount; i++) {
       const colors = isDarkMode 
@@ -176,7 +169,6 @@ function Home() {
     setParticles(newParticles);
   }, [isDarkMode]);
 
-  // Animate particles
   useEffect(() => {
     if (particles.length === 0) return;
     
@@ -190,7 +182,6 @@ function Home() {
     return () => clearInterval(interval);
   }, [particles.length]);
 
-  // Glitch effect (only in dark mode)
   useEffect(() => {
     if (!isDarkMode) return;
     
@@ -203,7 +194,6 @@ function Home() {
     return () => clearInterval(interval);
   }, [isDarkMode]);
 
-  // Handle image errors
   const handleImageError = (e) => {
     e.target.src = `https://ui-avatars.com/api/?name=Rossellah+Bodano&background=linear-gradient(45deg,#ff6b6b,#ffa726,#ffee58,#51cf66,#339af0)&color=fff&bold=true&size=200`;
   };
@@ -220,7 +210,6 @@ function Home() {
     e.target.src = `https://via.placeholder.com/800x1000/0a0a0a/cyan?text=Resume+Image`;
   };
 
-  // Function to handle certificate download
   const handleCertificateDownload = (certificateUrl) => {
     if (!certificateUrl) return;
     
@@ -234,7 +223,6 @@ function Home() {
     certificateDialog.close();
   };
 
-  // Function to handle resume PDF download
   const handleResumePDFDownload = () => {
     const resumeUrl = "/Rossellah_Marie_Bodano_Resume.pdf";
     const link = document.createElement('a');
@@ -245,7 +233,6 @@ function Home() {
     document.body.removeChild(link);
   };
 
-  // Function to handle resume image download
   const handleResumeImageDownload = () => {
     const resumeImageUrl = "/resume-image.png";
     const link = document.createElement('a');
@@ -288,6 +275,21 @@ function Home() {
     { icon: <FaLinkedin />, href: "https://www.linkedin.com/in/rossellah-marie-boda%C3%B1o-2195b7349", label: "LinkedIn", color: "from-blue-700 via-blue-800 to-blue-900" },
   ];
 
+  // Individual card animation variants
+  const cardVariants = (direction) => ({
+    hidden: { opacity: 0, x: direction === 'left' ? -100 : 100, y: 20 },
+    visible: { 
+      opacity: 1, 
+      x: 0, 
+      y: 0,
+      transition: { 
+        type: "spring", 
+        damping: 20, 
+        stiffness: 100,
+        duration: 0.8
+      } 
+    }
+  });
 
   return (
     <div 
@@ -297,7 +299,6 @@ function Home() {
       {/* Cosmic/Pattern Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {isDarkMode ? (
-          // Dark mode cosmic background
           <>
             <div className="absolute inset-0">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-pink-900/20"></div>
@@ -341,7 +342,6 @@ function Home() {
             </div>
           </>
         ) : (
-          // Light mode vibrant background
           <>
             <div className="absolute inset-0">
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-200/30 via-blue-200/30 to-purple-200/30"></div>
@@ -349,7 +349,6 @@ function Home() {
               <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-purple-300/20 via-transparent to-transparent"></div>
             </div>
 
-            {/* Colorful particles for light mode */}
             {particles.map(p => (
               <div
                 key={p.id}
@@ -366,7 +365,6 @@ function Home() {
               />
             ))}
 
-            {/* Geometric pattern for light mode */}
             <div className="absolute inset-0 opacity-20">
               <div 
                 className="absolute inset-0"
@@ -379,14 +377,13 @@ function Home() {
               ></div>
             </div>
 
-            {/* Colorful blobs for light mode */}
             <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-cyan-300/30 to-blue-300/30 rounded-full blur-3xl animate-pulse"></div>
             <div className="absolute bottom-20 right-20 w-72 h-72 bg-gradient-to-r from-purple-300/30 to-pink-300/30 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
           </>
         )}
       </div>
 
-      {/* Navigation Bar with theme toggle */}
+      {/* Enhanced Navigation Bar */}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
         scrolled 
           ? isDarkMode 
@@ -396,22 +393,28 @@ function Home() {
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
-            <div className="group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            {/* Logo area: circular text + MY PORTFOLIO text - always visible */}
+            <div className="flex items-center gap-2 sm:gap-3 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              <CircularText
+                text="ROSSELLAH MARIE D. BODAÑO"
+                spinDuration={15}
+                onHover="goBonkers"
+                className="w-12 h-12 sm:w-20 sm:h-20 text-[0.7rem] sm:text-sm font-black tracking-wider text-transparent bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text drop-shadow-lg"
+              />
               <div className="relative">
                 <div className={`absolute inset-0 bg-gradient-to-r from-cyan-500 to-pink-500 blur-xl opacity-30 transition-opacity duration-500 group-hover:opacity-60 ${glitchEffect ? 'animate-pulse' : ''}`}></div>
                 <div className="relative flex flex-col">
-                  <h1 className="font-bold text-xl sm:text-2xl bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    MY PORTFOLIO<sup className="text-base">†</sup>
+                  <h1 className="font-bold text-base sm:text-xl md:text-2xl bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg whitespace-nowrap">
+                    MY PORTFOLIO<sup className="text-[0.6rem] sm:text-base ml-0.5">†</sup>
                   </h1>
-                  <span className={`text-xs font-mono tracking-widest hidden sm:block ${
-                    isDarkMode ? "text-cyan-300/60" : "text-cyan-600/60"
-                  }`}>
+                  <span className={`text-[0.6rem] sm:text-xs font-mono tracking-widest drop-shadow ${isDarkMode ? "text-cyan-300/80" : "text-cyan-600/80"}`}>
                     CREATIVE DEVELOPER
                   </span>
                 </div>
               </div>
             </div>
 
+            {/* Desktop navigation items with enhanced hover */}
             <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
               {navItems.map((item) => (
                 item.action === "dialog" ? (
@@ -421,14 +424,14 @@ function Home() {
                       setActive(item.section);
                       resumeDialog.open();
                     }}
-                    className={`relative px-4 lg:px-5 py-2 lg:py-2.5 font-mono text-xs lg:text-sm tracking-widest transition-all duration-500 group overflow-hidden ${
+                    className={`relative px-4 lg:px-5 py-2 lg:py-2.5 font-mono text-xs lg:text-sm tracking-widest transition-all duration-300 group overflow-hidden rounded-lg hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30 ${
                       active === item.section 
-                        ? isDarkMode ? "text-white" : "text-cyan-600" 
+                        ? isDarkMode ? "text-white bg-gradient-to-r from-cyan-600/20 to-purple-600/20" : "text-cyan-600 bg-gradient-to-r from-cyan-500/10 to-purple-500/10" 
                         : isDarkMode ? "text-gray-400 hover:text-cyan-300" : "text-gray-600 hover:text-cyan-600"
                     }`}
                   >
-                    <span className="flex items-center gap-1 lg:gap-2">
-                      <span className={`${isDarkMode ? "text-cyan-400/50" : "text-cyan-600/50"} group-hover:text-cyan-300 transition-colors text-sm`}>{item.icon}</span>
+                    <span className="flex items-center gap-1 lg:gap-2 relative z-10">
+                      <span className={`${isDarkMode ? "text-cyan-400/70" : "text-cyan-600/70"} group-hover:text-cyan-300 transition-colors text-sm`}>{item.icon}</span>
                       <span className="hidden lg:inline">{item.label}</span>
                       <span className="lg:hidden text-xs">{item.label.substring(0, 3)}</span>
                     </span>
@@ -438,21 +441,21 @@ function Home() {
                         <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 blur-sm"></div>
                       </>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -skew-x-12"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-cyan-500/20 group-hover:via-purple-500/20 group-hover:to-pink-500/20 transition-all duration-500 -skew-x-12 rounded-lg"></div>
                   </button>
                 ) : (
                   <a
                     key={item.section}
                     href={`#${item.section}`}
                     onClick={() => setActive(item.section)}
-                    className={`relative px-4 lg:px-5 py-2 lg:py-2.5 font-mono text-xs lg:text-sm tracking-widest transition-all duration-500 group overflow-hidden ${
+                    className={`relative px-4 lg:px-5 py-2 lg:py-2.5 font-mono text-xs lg:text-sm tracking-widest transition-all duration-300 group overflow-hidden rounded-lg hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30 ${
                       active === item.section 
-                        ? isDarkMode ? "text-white" : "text-cyan-600" 
+                        ? isDarkMode ? "text-white bg-gradient-to-r from-cyan-600/20 to-purple-600/20" : "text-cyan-600 bg-gradient-to-r from-cyan-500/10 to-purple-500/10" 
                         : isDarkMode ? "text-gray-400 hover:text-cyan-300" : "text-gray-600 hover:text-cyan-600"
                     }`}
                   >
-                    <span className="flex items-center gap-1 lg:gap-2">
-                      <span className={`${isDarkMode ? "text-cyan-400/50" : "text-cyan-600/50"} group-hover:text-cyan-300 transition-colors text-sm`}>{item.icon}</span>
+                    <span className="flex items-center gap-1 lg:gap-2 relative z-10">
+                      <span className={`${isDarkMode ? "text-cyan-400/70" : "text-cyan-600/70"} group-hover:text-cyan-300 transition-colors text-sm`}>{item.icon}</span>
                       <span className="hidden lg:inline">{item.label}</span>
                       <span className="lg:hidden text-xs">{item.label.substring(0, 3)}</span>
                     </span>
@@ -462,7 +465,7 @@ function Home() {
                         <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 blur-sm"></div>
                       </>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -skew-x-12"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-cyan-500/20 group-hover:via-purple-500/20 group-hover:to-pink-500/20 transition-all duration-500 -skew-x-12 rounded-lg"></div>
                   </a>
                 )
               ))}
@@ -470,10 +473,10 @@ function Home() {
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
-                className={`ml-2 p-2 rounded-lg transition-all duration-300 ${
+                className={`ml-2 p-2 rounded-lg transition-all duration-300 hover:scale-110 ${
                   isDarkMode 
-                    ? "bg-gray-800/50 hover:bg-gray-700/50 text-yellow-400" 
-                    : "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 hover:from-cyan-500/30 hover:to-purple-500/30 text-gray-700"
+                    ? "bg-gray-800/50 hover:bg-gray-700/50 text-yellow-400 hover:shadow-lg hover:shadow-yellow-500/20" 
+                    : "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 hover:from-cyan-500/30 hover:to-purple-500/30 text-gray-700 hover:shadow-lg hover:shadow-cyan-500/30"
                 }`}
                 aria-label="Toggle theme"
               >
@@ -481,14 +484,14 @@ function Home() {
               </button>
             </div>
 
+            {/* Mobile right side: theme toggle + hamburger */}
             <div className="flex items-center gap-2 md:hidden">
-              {/* Mobile Theme Toggle */}
               <button
                 onClick={toggleTheme}
                 className={`p-2 rounded-lg transition-all duration-300 ${
                   isDarkMode 
-                    ? "bg-gray-800/50 text-yellow-400" 
-                    : "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-gray-700"
+                    ? "bg-gray-800/50 text-yellow-400 hover:bg-gray-700/50" 
+                    : "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-gray-700 hover:from-cyan-500/30 hover:to-purple-500/30"
                 }`}
                 aria-label="Toggle theme"
               >
@@ -512,12 +515,19 @@ function Home() {
             </div>
           </div>
 
+          {/* Mobile menu dropdown with enhanced hover effects */}
           {menuOpen && (
-            <div className={`md:hidden mt-4 backdrop-blur-2xl rounded-2xl border shadow-2xl animate-slideDown overflow-hidden ${
-              isDarkMode 
-                ? "bg-black/90 border-cyan-500/20 shadow-cyan-500/10" 
-                : "bg-white/90 border-cyan-500/30 shadow-lg"
-            }`}>
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className={`md:hidden mt-4 backdrop-blur-2xl rounded-2xl border shadow-2xl overflow-hidden ${
+                isDarkMode 
+                  ? "bg-black/90 border-cyan-500/20 shadow-cyan-500/10" 
+                  : "bg-white/90 border-cyan-500/30 shadow-lg"
+              }`}
+            >
               <div className="p-2 space-y-1">
                 {navItems.map((item) => (
                   item.action === "dialog" ? (
@@ -528,7 +538,7 @@ function Home() {
                         setActive(item.section);
                         resumeDialog.open();
                       }}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-lg font-mono text-sm tracking-wider transition-all duration-300 w-full ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg font-mono text-sm tracking-wider transition-all duration-300 w-full hover:scale-[1.02] hover:shadow-md ${
                         active === item.section
                           ? isDarkMode
                             ? "bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 text-white border border-cyan-500/30"
@@ -549,7 +559,7 @@ function Home() {
                         setMenuOpen(false);
                         setActive(item.section);
                       }}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-lg font-mono text-sm tracking-wider transition-all duration-300 ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg font-mono text-sm tracking-wider transition-all duration-300 w-full hover:scale-[1.02] hover:shadow-md ${
                         active === item.section
                           ? isDarkMode
                             ? "bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 text-white border border-cyan-500/30"
@@ -565,7 +575,7 @@ function Home() {
                   )
                 ))}
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
       </nav>
@@ -573,7 +583,7 @@ function Home() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20 relative z-10">
         {/* Hero Section */}
-        <header 
+        <section 
           className="text-center mb-20 sm:mb-32 relative"
           onMouseEnter={() => setIsHoveringHero(true)}
           onMouseLeave={() => setIsHoveringHero(false)}
@@ -586,7 +596,12 @@ function Home() {
             </div>
           )}
 
-          <div className="relative inline-block mb-8 sm:mb-12 group cursor-pointer" onClick={profileDialog.open}>
+          {/* Profile image with hover effect */}
+          <div 
+            className="relative inline-block mb-8 sm:mb-12 group"
+            onMouseEnter={() => setIsHoveringProfile(true)}
+            onMouseLeave={() => setIsHoveringProfile(false)}
+          >
             {isDarkMode ? (
               <>
                 <div className="absolute inset-0 animate-spin-slow">
@@ -623,6 +638,57 @@ function Home() {
             }`}>
               <FaMagic className="text-white text-xs sm:text-sm" />
             </div>
+
+            {/* Hover overlay card */}
+            <AnimatePresence>
+              {isHoveringProfile && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-4 w-64 p-4 rounded-xl shadow-2xl z-20 ${
+                    isDarkMode
+                      ? "bg-gradient-to-br from-gray-900/95 via-black/95 to-gray-900/95 border border-cyan-500/30 backdrop-blur-xl"
+                      : "bg-gradient-to-br from-white/95 via-blue-50/95 to-white/95 border border-cyan-500/30 backdrop-blur-xl"
+                  }`}
+                >
+                  <div className="text-center">
+                    <h3 className={`text-lg font-bold mb-1 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent`}>
+                      ROSSELLAH MARIE BODAÑO
+                    </h3>
+                    <p className={`text-xs mb-2 ${isDarkMode ? "text-cyan-300" : "text-cyan-600"}`}>
+                      DIGITAL ARTISAN & CREATIVE DEVELOPER
+                    </p>
+                    <p className={`text-xs leading-relaxed ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                      IT Student • Frontend Specialist from Gaddani, Tayum, Abra.
+                    </p>
+                    <div className="flex justify-center gap-2 mt-3">
+                      {["React", "JS", "Tailwind"].map((tag, i) => (
+                        <span
+                          key={i}
+                          className={`px-2 py-0.5 text-[10px] rounded-full ${
+                            isDarkMode
+                              ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                              : "bg-cyan-500/10 text-cyan-700 border border-cyan-500/30"
+                          }`}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Small arrow */}
+                  <div
+                    className={`absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 rotate-45 ${
+                      isDarkMode
+                        ? "bg-gray-900/95 border-t border-l border-cyan-500/30"
+                        : "bg-white/95 border-t border-l border-cyan-500/30"
+                    }`}
+                  ></div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           
           <div className="mb-6 sm:mb-8 px-2 sm:px-4 relative">
@@ -723,9 +789,9 @@ function Home() {
               <span>VIEW PROFILE</span>
             </button>
           </div>
-        </header>
+        </section>
 
-        {/* About Section - with 3D Interactive Lanyard */}
+        {/* About Section - Individual Elements Animate */}
         <section
           id="about"
           className="mb-20 sm:mb-32 relative group scroll-mt-20"
@@ -769,45 +835,63 @@ function Home() {
 
             <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
               <div className="space-y-4 sm:space-y-6">
-                <p className={`leading-relaxed text-sm sm:text-base md:text-lg ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}>
+                <motion.p
+                  variants={cardVariants('left')}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: false, amount: 0.3 }}
+                  className={`leading-relaxed text-sm sm:text-base md:text-lg ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
                   <span className={`font-bold ${isDarkMode ? "text-cyan-300" : "text-cyan-600"}`}>Digital Visionary</span> from Gaddani, Tayum, Abra, specializing in creating immersive web experiences that blend <span className={isDarkMode ? "text-purple-300" : "text-purple-600"}>cutting-edge technology</span> with <span className={isDarkMode ? "text-pink-300" : "text-pink-600"}>artistic expression</span>.
-                </p>
-                <p className={`leading-relaxed text-xs sm:text-sm md:text-base lg:text-lg ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}>
+                </motion.p>
+
+                <motion.p
+                  variants={cardVariants('left')}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: false, amount: 0.3 }}
+                  transition={{ delay: 0.1 }}
+                  className={`leading-relaxed text-xs sm:text-sm md:text-base lg:text-lg ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
                   With expertise in the modern web stack, I transform <span className={isDarkMode ? "text-cyan-300" : "text-cyan-600"}>abstract concepts</span> into <span className={isDarkMode ? "text-purple-300" : "text-purple-600"}>tangible digital realities</span>. Continuously pushing boundaries towards full-stack excellence while maintaining <span className={isDarkMode ? "text-pink-300" : "text-pink-600"}>flawless execution</span>.
-                </p>
-{/* ===== 3D INTERACTIVE LANYARD WITH CARD ===== */}
-<div className="w-full h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px]">
-  <Lanyard 
-    position={[0, 0, 20]} 
-    gravity={[0, -40, 0]} 
-    isDarkMode={isDarkMode}
-    profileImageUrl={profileImageUrl}
-    idCardImageUrl={idCardImageUrl}
-  />
+                </motion.p>
 
-  {/* Interactive Hint */}
-  <motion.p 
-    animate={{ opacity: [0.5, 1, 0.5] }}
-    transition={{ repeat: Infinity, duration: 2 }}
-    className={`text-[10px] font-mono tracking-wider mt-4 ${
-      isDarkMode ? "text-cyan-400" : "text-cyan-600"
-    }`}
-  >
-  </motion.p>
-</div>
+                <motion.div
+                  variants={cardVariants('left')}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: false, amount: 0.3 }}
+                  transition={{ delay: 0.2 }}
+                  className="w-full h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px]"
+                >
+                  <Lanyard 
+                    position={[0, 0, 20]} 
+                    gravity={[0, -40, 0]} 
+                    isDarkMode={isDarkMode}
+                    profileImageUrl={profileImageUrl}
+                    idCardImageUrl={idCardImageUrl}
+                  />
+                </motion.div>
 
-                {/* Stats */}
                 <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 sm:pt-8">
                   {[
                     { label: "PROJECTS", value: "15+", color: "from-cyan-500 to-blue-500", icon: <FaCode /> },
                     { label: "TECH STACK", value: "12+", color: "from-purple-500 to-pink-500", icon: <FaBolt /> },
                     { label: "EXPERIENCE", value: "3YRS", color: "from-pink-500 to-rose-500", icon: <FaFire /> },
                   ].map((stat, idx) => (
-                    <div key={idx} className="text-center group">
+                    <motion.div
+                      key={idx}
+                      variants={cardVariants('left')}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: false, amount: 0.3 }}
+                      transition={{ delay: 0.3 + idx * 0.1 }}
+                      className="text-center group"
+                    >
                       <div className={`relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-br ${stat.color} mx-auto mb-2 sm:mb-3 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
                         <span className="text-white text-lg sm:text-xl md:text-2xl">{stat.icon}</span>
                         <div className={`absolute inset-0 border-2 border-white/20 rounded-lg sm:rounded-xl md:rounded-2xl animate-pulse`}></div>
@@ -818,7 +902,7 @@ function Home() {
                       <div className={`text-xs sm:text-sm tracking-widest font-mono ${
                         isDarkMode ? "text-gray-400" : "text-gray-500"
                       }`}>{stat.label}</div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -834,7 +918,15 @@ function Home() {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {skills.map((skill, idx) => (
-                    <div key={idx} className="group relative">
+                    <motion.div
+                      key={idx}
+                      variants={cardVariants(idx % 2 === 0 ? 'left' : 'right')}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: false, amount: 0.3 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="group relative"
+                    >
                       <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-br ${skill.color} border border-white/10 hover:border-white/30 transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-lg sm:group-hover:shadow-xl ${
                         isDarkMode ? "group-hover:shadow-purple-500/20" : "group-hover:shadow-purple-500/30"
                       }`}>
@@ -855,7 +947,7 @@ function Home() {
                         </div>
                         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-purple-500/0 to-pink-500/0 rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -863,7 +955,7 @@ function Home() {
           </div>
         </section>
 
-        {/* Projects Section */}
+        {/* Projects Section - Individual Cards Animate */}
         <section id="projects" className="mb-20 sm:mb-32 scroll-mt-20">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12 sm:mb-16">
@@ -927,8 +1019,13 @@ function Home() {
                   glow: "from-green-500/20 to-emerald-500/20"
                 }
               ].map((project, index) => (
-                <div
+                <motion.div
                   key={index}
+                  variants={cardVariants(index % 2 === 0 ? 'left' : 'right')}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: false, amount: 0.3 }}
+                  transition={{ delay: index * 0.1 }}
                   className={`group relative bg-gradient-to-br backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 border shadow-lg sm:shadow-xl transition-all duration-700 cursor-pointer overflow-hidden hover:scale-[1.02] hover:border-purple-500/40 hover:shadow-xl sm:hover:shadow-2xl ${
                     isDarkMode 
                       ? "from-gray-900/50 via-black/50 to-gray-900/50 border-cyan-500/20 hover:shadow-cyan-500/10" 
@@ -1020,13 +1117,13 @@ function Home() {
                     </div>
                   </div>
                   <div className="absolute bottom-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Certificates Section */}
+        {/* Certificates Section - Individual Cards Animate */}
         <section id="certificates" className="mb-20 sm:mb-32 scroll-mt-20">
           <div className="text-center mb-12 sm:mb-16">
             <div className={`inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-1.5 sm:py-2.5 bg-gradient-to-r from-indigo-500/10 via-blue-500/10 to-cyan-500/10 rounded-full border backdrop-blur-sm mb-4 sm:mb-6 ${
@@ -1063,10 +1160,18 @@ function Home() {
               <span className="hidden sm:inline">CERTIFICATIONS</span>
               <span className="sm:hidden">CISCO</span>
             </button>
+
             <button
               onClick={() => setCertTab("webinars")}
-              className={`px-4 sm:px-6 md:px-8 lg:px-10 py-2 sm:py-3 rounded-lg sm:rounded-xl font-mono text-xs sm:text-sm tracking-wider transition-all duration-500 flex items
-                              }`}
+              className={`px-4 sm:px-6 md:px-8 lg:px-10 py-2 sm:py-3 rounded-lg sm:rounded-xl font-mono text-xs sm:text-sm tracking-wider transition-all duration-500 flex items-center gap-2 sm:gap-3 ${
+                certTab === "webinars"
+                  ? isDarkMode
+                    ? "bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-rose-600/20 text-white border border-purple-500/30 shadow-lg shadow-purple-500/20"
+                    : "bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-rose-500/20 text-purple-700 border border-purple-500/50 shadow-lg shadow-purple-500/30"
+                  : isDarkMode
+                    ? "bg-gradient-to-r from-gray-800/70 to-black/70 text-gray-300 border border-gray-700/50 hover:border-purple-500/30 hover:text-purple-300"
+                    : "bg-gradient-to-r from-gray-100/70 to-gray-200/70 text-gray-700 border border-gray-300/50 hover:border-purple-500/50 hover:text-purple-600"
+              }`}
             >
               <FaComments className="text-xs sm:text-sm" />
               <span className="hidden sm:inline">WEBINARS</span>
@@ -1121,8 +1226,13 @@ function Home() {
                     color: "from-orange-500/20 to-red-500/20"
                   }
                 ].map((cert, index) => (
-                  <div
+                  <motion.div
                     key={index}
+                    variants={cardVariants(index % 2 === 0 ? 'left' : 'right')}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: false, amount: 0.3 }}
+                    transition={{ delay: index * 0.1 }}
                     className={`group relative rounded-xl sm:rounded-2xl md:rounded-3xl border bg-gradient-to-br backdrop-blur-xl p-3 sm:p-4 md:p-5 shadow-lg sm:shadow-xl transition-all duration-700 cursor-pointer hover:scale-[1.03] hover:border-cyan-500/40 hover:shadow-xl sm:hover:shadow-2xl ${
                       isDarkMode 
                         ? "from-gray-900/50 via-black/50 to-gray-900/50 border-cyan-500/20 hover:shadow-cyan-500/10" 
@@ -1165,7 +1275,7 @@ function Home() {
                         CLICK TO VIEW
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -1188,8 +1298,13 @@ function Home() {
                     color: "from-cyan-500/20 to-blue-500/20"
                   }
                 ].map((webinar, index) => (
-                  <div
+                  <motion.div
                     key={index}
+                    variants={cardVariants(index % 2 === 0 ? 'left' : 'right')}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: false, amount: 0.3 }}
+                    transition={{ delay: index * 0.1 }}
                     className={`group relative rounded-xl sm:rounded-2xl md:rounded-3xl border bg-gradient-to-br backdrop-blur-xl p-3 sm:p-4 md:p-5 shadow-lg sm:shadow-xl transition-all duration-700 cursor-pointer hover:scale-[1.03] hover:border-cyan-500/40 hover:shadow-xl sm:hover:shadow-2xl ${
                       isDarkMode 
                         ? "from-gray-900/50 via-black/50 to-gray-900/50 border-cyan-500/20 hover:shadow-cyan-500/10" 
@@ -1232,15 +1347,22 @@ function Home() {
                         CLICK TO VIEW
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
           )}
         </section>
 
-        {/* Contact Section */}
-        <section id="contact" className="mb-12 sm:mb-20 scroll-mt-20">
+        {/* Contact Section - Animate as whole block from left */}
+        <motion.section
+          id="contact"
+          variants={cardVariants('left')}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.2 }}
+          className="mb-12 sm:mb-20 scroll-mt-20"
+        >
           <div className={`bg-gradient-to-br backdrop-blur-2xl rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 lg:p-10 border shadow-xl sm:shadow-2xl overflow-hidden relative ${
             isDarkMode 
               ? "from-gray-900/40 via-black/40 to-gray-900/40 border-cyan-500/20 shadow-cyan-500/10" 
@@ -1390,7 +1512,7 @@ function Home() {
               </div>
             </div>
           </div>
-        </section>
+        </motion.section>
       </div>
 
       {/* Footer */}
@@ -1433,53 +1555,6 @@ function Home() {
       </footer>
 
       {/* Dialogs */}
-      <Dialog
-        isOpen={profileDialog.isOpen}
-        onClose={profileDialog.close}
-        title={
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-md sm:rounded-lg bg-gradient-to-r from-cyan-500 to-purple-500 flex items-center justify-center">
-              <FaUser className="text-white text-xs sm:text-sm" />
-            </div>
-            <span className="text-white font-bold text-sm sm:text-base tracking-wider">DIGITAL PROFILE</span>
-          </div>
-        }
-        className={`bg-gradient-to-br border backdrop-blur-2xl ${
-          isDarkMode 
-            ? "from-gray-900/90 via-black/90 to-gray-900/90 border-cyan-500/20" 
-            : "from-white/90 via-blue-50/90 to-white/90 border-cyan-500/30"
-        } max-w-[95vw] sm:max-w-lg md:max-w-xl`}
-      >
-        <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-full animate-spin-slow opacity-20 blur-xl"></div>
-            <img
-              src={profileImageUrl}
-              alt="Rossellah Marie Bodaño"
-              className={`relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-full border-4 shadow-2xl object-cover ${
-                isDarkMode ? "border-black" : "border-white"
-              }`}
-              onError={handleImageError}
-            />
-          </div>
-          <div className="text-center px-2">
-            <h3 className={`text-xl sm:text-2xl md:text-3xl font-bold mb-2 ${
-              isDarkMode ? "text-white" : "text-gray-800"
-            }`}>
-              ROSSELLAH MARIE BODAÑO
-            </h3>
-            <p className="text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text font-bold text-xs sm:text-sm md:text-base tracking-wider mb-2 sm:mb-3">
-              DIGITAL ARTISAN & CREATIVE DEVELOPER
-            </p>
-            <div className={`inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-full border ${
-              isDarkMode ? "border-cyan-500/30" : "border-cyan-500/50"
-            }`}>
-              <span className={`text-xs sm:text-sm font-mono tracking-wider ${isDarkMode ? "text-cyan-300" : "text-cyan-600"}`}>IT STUDENT • FRONTEND SPECIALIST</span>
-            </div>
-          </div>
-        </div>
-      </Dialog>
-
       <Dialog
         isOpen={certificateDialog.isOpen}
         onClose={certificateDialog.close}
