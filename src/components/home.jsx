@@ -54,9 +54,7 @@ import { Dialog, useDialog } from "./Dialog";
 import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import Lanyard from "./Lanyard";
 import CircularText from "./CircularText";
-import InfiniteMenu from './InfiniteMenu'; // <-- NEW IMPORT
 
-// Memoize Lanyard to prevent unnecessary re-renders
 const MemoizedLanyard = memo(Lanyard);
 
 function Home() {
